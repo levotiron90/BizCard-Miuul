@@ -15,12 +15,10 @@ const MailIcon = () => (
   </svg>
 );
 
-const BuildingIcon = () => (
+const LocationIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 21h18" />
-    <path d="M6 21V7l6-4 6 4v14" />
-    <path d="M10 21v-6h4v6" />
-    <path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01" />
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
   </svg>
 );
 
@@ -57,8 +55,21 @@ function todayISODate() {
   return `${year}-${month}-${day}`;
 }
 
-function Avatar({ initials }) {
-  return <div className="avatar">{initials}</div>;
+function buildVCard(person) {
+  const lines = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `N:;${person.name};;;`,
+    `FN:${person.name}`,
+    `ORG:${person.company}`,
+    `TITLE:${person.title}`,
+    `TEL;TYPE=CELL:${person.phone}`,
+    `EMAIL:${person.email}`,
+    `URL:${person.website}`,
+    `ADR;TYPE=WORK:;;${person.location};;;;`,
+    "END:VCARD",
+  ];
+  return lines.join("\r\n");
 }
 
 function ContactList({ items }) {
@@ -223,45 +234,62 @@ function CardActionsForm({ person }) {
   );
 }
 
-function ProfileCard({ person }) {
-  const contactItems = [
-    { href: person.phoneHref, icon: <PhoneIcon />, label: person.phone },
-    { href: person.emailHref, icon: <MailIcon />, label: person.email },
-    { href: person.companyEmailHref, icon: <BuildingIcon />, label: person.companyLabel },
-  ];
+function QRCodeSection({ person, url }) {
+  const vcardHref = `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(person))}`;
+  const vcardFilename = `${slugify(person.name)}.vcf`;
 
   return (
-    <div className="card">
-      <Avatar initials={person.initials} />
-      <div className="name">{person.name}</div>
-      <div className="title">{person.title}</div>
-      <div className="company">{person.company}</div>
-
-      <div className="divider"></div>
-
-      <ContactList items={contactItems} />
-
-      <div className="socials">
-        <a className="social-link" href={person.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-          <LinkedinIcon />
-        </a>
-        <a className="social-link" href={person.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-          <GithubIcon />
-        </a>
-      </div>
-
-      <div className="divider"></div>
-
-      <CardActionsForm person={person} />
+    <div className="qr-section">
+      <QRCodeSVG value={url} size={132} bgColor="#ffffff" fgColor="#0d1b34" level="M" />
+      <div className="qr-caption">Rehbere eklemek için taratın</div>
+      <a className="vcard-link" href={vcardHref} download={vcardFilename}>veya vCard indir (.vcf)</a>
     </div>
   );
 }
 
-function QRCodeBlock({ url }) {
+function ProfileCard({ person, siteUrl }) {
+  const locationHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(person.location)}`;
+
+  const contactItems = [
+    { href: person.phoneHref, icon: <PhoneIcon />, label: person.phone },
+    { href: person.emailHref, icon: <MailIcon />, label: person.email },
+    { href: locationHref, icon: <LocationIcon />, label: person.location },
+  ];
+
   return (
-    <div className="qr-block">
-      <QRCodeSVG value={url} size={132} bgColor="#ffffff" fgColor="#1f1b3d" level="M" />
-      <div className="qr-caption">Kartviziti taramak için QR kodu okutun</div>
+    <div className="card">
+      <div className="header-bar"></div>
+
+      <div className="card-body">
+        <div className="company-label">{person.company}</div>
+        <div className="name">{person.name}</div>
+        <div className="title">{person.title}</div>
+
+        <div className="divider"></div>
+
+        <ContactList items={contactItems} />
+
+        <div className="socials">
+          <a className="social-link" href={person.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <LinkedinIcon />
+          </a>
+          <a className="social-link" href={person.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <GithubIcon />
+          </a>
+        </div>
+
+        <div className="divider"></div>
+
+        <CardActionsForm person={person} />
+
+        <div className="divider"></div>
+
+        <QRCodeSection person={person} url={siteUrl} />
+      </div>
+
+      <div className="footer-bar">
+        <a href={person.website} target="_blank" rel="noopener noreferrer">www.veriendustri.com</a>
+      </div>
     </div>
   );
 }
@@ -269,12 +297,7 @@ function QRCodeBlock({ url }) {
 function App() {
   const [person] = useState(window.BIZCARD_PERSON);
 
-  return (
-    <div className="page">
-      <ProfileCard person={person} />
-      <QRCodeBlock url={window.BIZCARD_SITE_URL} />
-    </div>
-  );
+  return <ProfileCard person={person} siteUrl={window.BIZCARD_SITE_URL} />;
 }
 
 const root = createRoot(document.getElementById("root"));
