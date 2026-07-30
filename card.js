@@ -49,6 +49,14 @@ function slugify(text) {
     .replace(/(^-|-$)/g, "");
 }
 
+function todayISODate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function Avatar({ initials }) {
   return <div className="avatar">{initials}</div>;
 }
@@ -66,28 +74,31 @@ function ContactList({ items }) {
   );
 }
 
-function SaveCardForm({ person }) {
+function CardActionsForm({ person }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [date, setDate] = useState("");
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-
+  function validateContact() {
     const nextErrors = {};
     if (!name.trim()) nextErrors.name = "Lütfen adınızı girin.";
     if (!email.trim() || !EMAIL_PATTERN.test(email.trim())) {
       nextErrors.email = "Lütfen geçerli bir e-posta adresi girin.";
     }
-    setErrors(nextErrors);
+    return nextErrors;
+  }
 
+  async function handleSaveCard() {
+    const nextErrors = validateContact();
+    setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       setStatus(null);
       return;
     }
 
-    setStatus("sending");
+    setStatus({ action: "card", state: "sending" });
     try {
       const response = await fetch(window.BIZCARD_WEBHOOKS.cardSave, {
         method: "POST",
@@ -101,16 +112,51 @@ function SaveCardForm({ person }) {
         }),
       });
       if (!response.ok) throw new Error("Webhook isteği başarısız oldu.");
-      setStatus("success");
+      setStatus({ action: "card", state: "success" });
     } catch (err) {
-      setStatus("info");
+      setStatus({ action: "card", state: "info" });
     }
   }
 
+  async function handleRequestMeeting() {
+    const nextErrors = validateContact();
+    if (!date) {
+      nextErrors.date = "Lütfen bir tarih seçin.";
+    } else if (date < todayISODate()) {
+      nextErrors.date = "Geçmiş bir tarih seçemezsiniz.";
+    }
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      setStatus(null);
+      return;
+    }
+
+    setStatus({ action: "meeting", state: "sending" });
+    try {
+      const response = await fetch(window.BIZCARD_WEBHOOKS.meetingRequest, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "meeting.request",
+          cardId: slugify(person.name),
+          timestamp: new Date().toISOString(),
+          visitor: { name: name.trim(), email: email.trim(), phone: null },
+          data: { preferredDate: date, preferredTime: null, message: null },
+        }),
+      });
+      if (!response.ok) throw new Error("Webhook isteği başarısız oldu.");
+      setStatus({ action: "meeting", state: "success" });
+    } catch (err) {
+      setStatus({ action: "meeting", state: "info" });
+    }
+  }
+
+  const isSending = status && status.state === "sending";
+
   return (
-    <form className="save-form" onSubmit={handleSubmit} noValidate>
+    <div className="save-form">
       <div className="form-field">
-        <label className="form-label" htmlFor="visitor-name">Adınız</label>
+        <label className="form-label" htmlFor="visitor-name">İsim</label>
         <input
           id="visitor-name"
           className={errors.name ? "form-input form-input-error" : "form-input"}
@@ -135,19 +181,45 @@ function SaveCardForm({ person }) {
         {errors.email && <div className="form-error">{errors.email}</div>}
       </div>
 
-      <button className="form-button" type="submit" disabled={status === "sending"}>
-        {status === "sending" ? "Gönderiliyor..." : "Kartı Kaydet"}
-      </button>
+      <div className="form-field">
+        <label className="form-label" htmlFor="visitor-date">Tarih</label>
+        <input
+          id="visitor-date"
+          className={errors.date ? "form-input form-input-error" : "form-input"}
+          type="date"
+          min={todayISODate()}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+        {errors.date && <div className="form-error">{errors.date}</div>}
+      </div>
 
-      {status === "success" && (
+      <div className="form-buttons">
+        <button className="form-button" type="button" onClick={handleSaveCard} disabled={isSending}>
+          {status && status.action === "card" && status.state === "sending" ? "Gönderiliyor..." : "Kartı Kaydet"}
+        </button>
+        <button className="form-button" type="button" onClick={handleRequestMeeting} disabled={isSending}>
+          {status && status.action === "meeting" && status.state === "sending" ? "Gönderiliyor..." : "Toplantı Talep Et"}
+        </button>
+      </div>
+
+      {status && status.action === "card" && status.state === "success" && (
         <div className="form-status form-status-success">Bilgileriniz kaydedildi, teşekkürler!</div>
       )}
-      {status === "info" && (
+      {status && status.action === "card" && status.state === "info" && (
         <div className="form-status form-status-info">
           Şu an demo ortamındasınız; kayıt gerçek bir sunucuya bağlı olmadığı için iletilemedi.
         </div>
       )}
-    </form>
+      {status && status.action === "meeting" && status.state === "success" && (
+        <div className="form-status form-status-success">Toplantı talebiniz alındı, teşekkürler!</div>
+      )}
+      {status && status.action === "meeting" && status.state === "info" && (
+        <div className="form-status form-status-info">
+          Şu an demo ortamındasınız; talep gerçek bir sunucuya bağlı olmadığı için iletilemedi.
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -180,7 +252,7 @@ function ProfileCard({ person }) {
 
       <div className="divider"></div>
 
-      <SaveCardForm person={person} />
+      <CardActionsForm person={person} />
     </div>
   );
 }
