@@ -101,7 +101,9 @@ function CardActionsForm({ person }) {
     return nextErrors;
   }
 
-  async function handleSaveCard() {
+  // Butonlar henüz bir webhook'a bağlı değil (n8n entegrasyonu sonraya
+  // planlanıyor); şimdilik yalnızca alanları doğrulayıp sonucu gösteriyoruz.
+  function handleSaveCard() {
     const nextErrors = validateContact();
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
@@ -109,27 +111,10 @@ function CardActionsForm({ person }) {
       return;
     }
 
-    setStatus({ action: "card", state: "sending" });
-    try {
-      const response = await fetch(window.BIZCARD_WEBHOOKS.cardSave, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event: "card.save",
-          cardId: slugify(person.name),
-          timestamp: new Date().toISOString(),
-          visitor: { name: name.trim(), email: email.trim(), phone: null },
-          data: { note: null },
-        }),
-      });
-      if (!response.ok) throw new Error("Webhook isteği başarısız oldu.");
-      setStatus({ action: "card", state: "success" });
-    } catch (err) {
-      setStatus({ action: "card", state: "info" });
-    }
+    setStatus({ action: "card", state: "success" });
   }
 
-  async function handleRequestMeeting() {
+  function handleRequestMeeting() {
     const nextErrors = validateContact();
     if (!date) {
       nextErrors.date = "Lütfen bir tarih seçin.";
@@ -142,27 +127,8 @@ function CardActionsForm({ person }) {
       return;
     }
 
-    setStatus({ action: "meeting", state: "sending" });
-    try {
-      const response = await fetch(window.BIZCARD_WEBHOOKS.meetingRequest, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event: "meeting.request",
-          cardId: slugify(person.name),
-          timestamp: new Date().toISOString(),
-          visitor: { name: name.trim(), email: email.trim(), phone: null },
-          data: { preferredDate: date, preferredTime: null, message: null },
-        }),
-      });
-      if (!response.ok) throw new Error("Webhook isteği başarısız oldu.");
-      setStatus({ action: "meeting", state: "success" });
-    } catch (err) {
-      setStatus({ action: "meeting", state: "info" });
-    }
+    setStatus({ action: "meeting", state: "success" });
   }
-
-  const isSending = status && status.state === "sending";
 
   return (
     <div className="save-form">
@@ -206,29 +172,15 @@ function CardActionsForm({ person }) {
       </div>
 
       <div className="form-buttons">
-        <button className="form-button" type="button" onClick={handleSaveCard} disabled={isSending}>
-          {status && status.action === "card" && status.state === "sending" ? "Gönderiliyor..." : "Kartı Kaydet"}
-        </button>
-        <button className="form-button" type="button" onClick={handleRequestMeeting} disabled={isSending}>
-          {status && status.action === "meeting" && status.state === "sending" ? "Gönderiliyor..." : "Toplantı Talep Et"}
-        </button>
+        <button className="form-button" type="button" onClick={handleSaveCard}>Kartı Kaydet</button>
+        <button className="form-button" type="button" onClick={handleRequestMeeting}>Toplantı Talep Et</button>
       </div>
 
       {status && status.action === "card" && status.state === "success" && (
-        <div className="form-status form-status-success">Bilgileriniz kaydedildi, teşekkürler!</div>
-      )}
-      {status && status.action === "card" && status.state === "info" && (
-        <div className="form-status form-status-info">
-          Şu an demo ortamındasınız; kayıt gerçek bir sunucuya bağlı olmadığı için iletilemedi.
-        </div>
+        <div className="form-status form-status-success">Kart kaydedildi, teşekkürler!</div>
       )}
       {status && status.action === "meeting" && status.state === "success" && (
         <div className="form-status form-status-success">Toplantı talebiniz alındı, teşekkürler!</div>
-      )}
-      {status && status.action === "meeting" && status.state === "info" && (
-        <div className="form-status form-status-info">
-          Şu an demo ortamındasınız; talep gerçek bir sunucuya bağlı olmadığı için iletilemedi.
-        </div>
       )}
     </div>
   );
