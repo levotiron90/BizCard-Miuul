@@ -31,12 +31,13 @@
   }
 
   .header-bar {
-    height: 72px;
+    padding: 32px 32px 28px;
     background: #0d1b34;
+    text-align: center;
   }
 
   .card-body {
-    padding: 32px 32px 24px;
+    padding: 28px 32px 24px;
     text-align: center;
   }
 
@@ -45,14 +46,14 @@
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #8a94a6;
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .name {
     margin-top: 6px;
     font-size: 22px;
     font-weight: 700;
-    color: #0d1b34;
+    color: #ffffff;
   }
 
   .title {
@@ -61,7 +62,7 @@
     font-weight: 600;
     letter-spacing: 0.4px;
     text-transform: uppercase;
-    color: #1fb6c9;
+    color: #4fd4e0;
   }
 
   .divider {
@@ -259,6 +260,10 @@
   }
 
   @media (max-width: 400px) {
+    .header-bar {
+      padding: 26px 22px 22px;
+    }
+
     .card-body {
       padding: 28px 22px 20px;
     }

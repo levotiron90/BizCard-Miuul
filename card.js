@@ -258,15 +258,13 @@ function ProfileCard({ person, siteUrl }) {
 
   return (
     <div className="card">
-      <div className="header-bar"></div>
-
-      <div className="card-body">
+      <div className="header-bar">
         <div className="company-label">{person.company}</div>
         <div className="name">{person.name}</div>
         <div className="title">{person.title}</div>
+      </div>
 
-        <div className="divider"></div>
-
+      <div className="card-body">
         <ContactList items={contactItems} />
 
         <div className="socials">
