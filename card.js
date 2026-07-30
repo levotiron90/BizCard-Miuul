@@ -261,7 +261,7 @@ function ProfileCard({ person, siteUrl }) {
       <div className="header-bar">
         <div className="company-label">{person.company}</div>
         <div className="name">{person.name}</div>
-        <div className="title">{person.title}</div>
+        <div className="title" lang="en">{person.title}</div>
       </div>
 
       <div className="card-body">
