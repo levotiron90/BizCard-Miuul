@@ -146,6 +146,107 @@
     text-align: left;
   }
 
+  .consent-field {
+    margin-top: 4px;
+  }
+
+  .consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .consent-checkbox {
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .consent-label span {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #33404f;
+  }
+
+  .consent-link {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 600;
+    color: #1fb6c9;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .policy-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 52, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+  }
+
+  .policy-modal {
+    width: 100%;
+    max-width: 420px;
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .policy-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: #0d1b34;
+  }
+
+  .policy-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .policy-close {
+    border: none;
+    background: none;
+    color: #ffffff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .policy-body {
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .policy-section {
+    margin-bottom: 16px;
+  }
+
+  .policy-heading {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0d1b34;
+    margin-bottom: 6px;
+  }
+
+  .policy-paragraph {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #5a6b7a;
+    margin-bottom: 6px;
+  }
+
   .form-field {
     margin-bottom: 14px;
   }

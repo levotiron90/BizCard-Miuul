@@ -85,6 +85,33 @@ function ContactList({ items }) {
   );
 }
 
+function PrivacyPolicyModal({ open, onClose }) {
+  if (!open) return null;
+
+  const policy = window.BIZCARD_PRIVACY_POLICY;
+
+  return (
+    <div className="policy-overlay" onClick={onClose}>
+      <div className="policy-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="policy-header">
+          <div className="policy-title">KVKK Aydınlatma Metni</div>
+          <button className="policy-close" type="button" onClick={onClose} aria-label="Kapat">×</button>
+        </div>
+        <div className="policy-body">
+          {policy.sections.map((section) => (
+            <div key={section.heading} className="policy-section">
+              <h3 className="policy-heading">{section.heading}</h3>
+              {section.body.map((paragraph, index) => (
+                <p key={index} className="policy-paragraph">{paragraph}</p>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CardActionsForm({ person }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -92,12 +119,17 @@ function CardActionsForm({ person }) {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState({ card: false, meeting: false });
+  const [consent, setConsent] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
 
   function validateContact() {
     const nextErrors = {};
     if (!name.trim()) nextErrors.name = "Lütfen adınızı girin.";
     if (!email.trim() || !EMAIL_PATTERN.test(email.trim())) {
       nextErrors.email = "Lütfen geçerli bir e-posta adresi girin.";
+    }
+    if (!consent) {
+      nextErrors.consent = "Lütfen KVKK Aydınlatma Metni'ni onaylayın.";
     }
     return nextErrors;
   }
@@ -182,6 +214,30 @@ function CardActionsForm({ person }) {
         {errors.date && <div className="form-error">{errors.date}</div>}
       </div>
 
+      <div className="form-field consent-field">
+        <label className="consent-label" htmlFor="visitor-consent">
+          <input
+            id="visitor-consent"
+            className="consent-checkbox"
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+          />
+          <span>
+            Kişisel verilerimin ulaşım/toplantı talebimin değerlendirilmesi amacıyla işlenmesini{" "}
+            <button
+              className="consent-link"
+              type="button"
+              onClick={() => setShowPolicy(true)}
+            >
+              KVKK Aydınlatma Metni
+            </button>{" "}
+            kapsamında kabul ediyorum.
+          </span>
+        </label>
+        {errors.consent && <div className="form-error">{errors.consent}</div>}
+      </div>
+
       <div className="form-buttons">
         <button
           className="form-button"
@@ -207,6 +263,8 @@ function CardActionsForm({ person }) {
       {status && status.action === "meeting" && status.state === "success" && (
         <div className="form-status form-status-success">Toplantı talebiniz alındı, teşekkürler!</div>
       )}
+
+      <PrivacyPolicyModal open={showPolicy} onClose={() => setShowPolicy(false)} />
     </div>
   );
 }
