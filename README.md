@@ -2,12 +2,15 @@
 
 Sercan BALLI için hazırlanmış, tek sayfalık dijital kartvizit projesi. Şu an basit bir web sayfası; ileride React tabanlı bir web/mobil uygulamaya dönüşecek.
 
+**Canlı adres:** https://biz-card-miuul.vercel.app/ (Vercel, `ders2` dalındaki her push ile otomatik güncellenir)
+
 ## Dosyalar
 
 | Dosya | Açıklama |
 |---|---|
-| `index.html` | Sade HTML/CSS kartvizit. Çift tıklayarak doğrudan tarayıcıda açılabilir. |
-| `react.html` | Aynı kartvizitin React (CDN üzerinden, kurulum gerektirmeyen) versiyonu. `Avatar`, `ContactList`, `ProfileCard` bileşenlerine bölünmüştür. |
+| `index.html` | Sade HTML/CSS kartvizit. Çift tıklayarak doğrudan tarayıcıda açılabilir. Vercel'de `/demo` yolunda yayında. |
+| `react.html` | Aynı kartvizitin React (CDN üzerinden, kurulum gerektirmeyen) versiyonu. `Avatar`, `ContactList`, `ProfileCard` bileşenlerine bölünmüştür. Vercel'de ana adreste (`/`) yayında. |
+| `vercel.json` | `/` adresini `react.html`'e, `/demo` adresini `index.html`'e yönlendiren Vercel rewrite kuralları. |
 | `CLAUDE.md` | Projenin kapsamı, tonu ve kısıtları. |
 | `.claude/skills/bizcard-conventions/` | Bileşen dosya düzeni ve webhook JSON sözleşmesi kuralları. |
 
