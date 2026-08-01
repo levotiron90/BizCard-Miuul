@@ -186,15 +186,29 @@ function CardActionsForm({ person }) {
   );
 }
 
-function QRCodeSection({ person, url }) {
+function SaveToPhoneSection({ person }) {
   const vcardHref = `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(person))}`;
   const vcardFilename = `${slugify(person.name)}.vcf`;
 
   return (
+    <div className="save-phone-section">
+      <div className="save-phone-title">Kartviziti Telefonuma Kaydet</div>
+      <div className="save-phone-desc">
+        Bilgilerimi rehberine ekle, ihtiyacın olduğunda doğrudan bana ulaşabilirsin.
+      </div>
+      <a className="save-phone-button" href={vcardHref} download={vcardFilename}>Telefonuma Ekle</a>
+    </div>
+  );
+}
+
+function QRCodeSection({ url }) {
+  const displayUrl = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+  return (
     <div className="qr-section">
       <QRCodeSVG value={url} size={132} bgColor="#ffffff" fgColor="#0d1b34" level="M" />
-      <div className="qr-caption">Rehbere eklemek için taratın</div>
-      <a className="vcard-link" href={vcardHref} download={vcardFilename}>veya vCard indir (.vcf)</a>
+      <div className="qr-caption">Telefonla tarayarak görüntüleyin</div>
+      <div className="qr-domain">{displayUrl}</div>
     </div>
   );
 }
@@ -234,7 +248,11 @@ function ProfileCard({ person, siteUrl }) {
 
         <div className="divider"></div>
 
-        <QRCodeSection person={person} url={siteUrl} />
+        <SaveToPhoneSection person={person} />
+
+        <div className="divider"></div>
+
+        <QRCodeSection url={siteUrl} />
       </div>
 
       <div className="footer-bar">
