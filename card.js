@@ -91,6 +91,7 @@ function CardActionsForm({ person }) {
   const [date, setDate] = useState("");
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
+  const [submitting, setSubmitting] = useState({ card: false, meeting: false });
 
   function validateContact() {
     const nextErrors = {};
@@ -103,6 +104,8 @@ function CardActionsForm({ person }) {
 
   // Butonlar henüz bir webhook'a bağlı değil (n8n entegrasyonu sonraya
   // planlanıyor); şimdilik yalnızca alanları doğrulayıp sonucu gösteriyoruz.
+  // Gönderim sırasında ilgili buton kısa süreliğine kilitlenir, böylece
+  // art arda tıklanarak birden fazla kez tetiklenmesi engellenir.
   function handleSaveCard() {
     const nextErrors = validateContact();
     setErrors(nextErrors);
@@ -111,7 +114,11 @@ function CardActionsForm({ person }) {
       return;
     }
 
-    setStatus({ action: "card", state: "success" });
+    setSubmitting((prev) => ({ ...prev, card: true }));
+    setTimeout(() => {
+      setSubmitting((prev) => ({ ...prev, card: false }));
+      setStatus({ action: "card", state: "success" });
+    }, 600);
   }
 
   function handleRequestMeeting() {
@@ -127,7 +134,11 @@ function CardActionsForm({ person }) {
       return;
     }
 
-    setStatus({ action: "meeting", state: "success" });
+    setSubmitting((prev) => ({ ...prev, meeting: true }));
+    setTimeout(() => {
+      setSubmitting((prev) => ({ ...prev, meeting: false }));
+      setStatus({ action: "meeting", state: "success" });
+    }, 600);
   }
 
   return (
@@ -172,8 +183,22 @@ function CardActionsForm({ person }) {
       </div>
 
       <div className="form-buttons">
-        <button className="form-button" type="button" onClick={handleSaveCard}>Kartı Kaydet</button>
-        <button className="form-button" type="button" onClick={handleRequestMeeting}>Toplantı Talep Et</button>
+        <button
+          className="form-button"
+          type="button"
+          onClick={handleSaveCard}
+          disabled={submitting.card}
+        >
+          {submitting.card ? "Gönderiliyor..." : "Kartı Kaydet"}
+        </button>
+        <button
+          className="form-button"
+          type="button"
+          onClick={handleRequestMeeting}
+          disabled={submitting.meeting}
+        >
+          {submitting.meeting ? "Gönderiliyor..." : "Toplantı Talep Et"}
+        </button>
       </div>
 
       {status && status.action === "card" && status.state === "success" && (
