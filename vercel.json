@@ -1,6 +1,7 @@
 {
-  "rewrites": [
-    { "source": "/", "destination": "/react.html" },
-    { "source": "/demo", "destination": "/index.html" }
+  "routes": [
+    { "src": "^/$", "dest": "/react.html" },
+    { "src": "^/demo$", "dest": "/index.html" },
+    { "handle": "filesystem" }
   ]
 }
