@@ -1,14 +1,21 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, StatusBar } from "react-native";
+import ProfileCard from "./src/components/ProfileCard";
+import person from "./src/data/person";
+import siteUrl from "./src/data/site";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>BizCard mobile — kurulum devam ediyor</Text>
-    </View>
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="light-content" />
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <ProfileCard person={person} siteUrl={siteUrl} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center" },
+  safe: { flex: 1, backgroundColor: "#6a5cff" },
+  scroll: { flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 20 },
 });
