@@ -16,6 +16,6 @@ export default function QRCodeSection({ url }) {
 
 const styles = StyleSheet.create({
   section: { alignItems: "center", marginVertical: 8 },
-  caption: { fontSize: 12, color: "#8a86a3", marginTop: 10 },
-  domain: { fontSize: 13, color: "#3a3560", fontWeight: "600", marginTop: 2 },
+  caption: { fontSize: 13, fontWeight: "600", color: "#1fb6c9", marginTop: 12 },
+  domain: { fontSize: 12, color: "#8a94a6", marginTop: 4 },
 });

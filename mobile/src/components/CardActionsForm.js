@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Platform, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import PrivacyPolicyModal from "./PrivacyPolicyModal";
 import { EMAIL_PATTERN, todayISODate } from "../utils/vcard";
@@ -80,6 +81,7 @@ export default function CardActionsForm() {
           value={name}
           onChangeText={setName}
           placeholder="Ad Soyad"
+          placeholderTextColor="#8a94a6"
         />
         {errors.name && <Text style={styles.error}>{errors.name}</Text>}
       </View>
@@ -91,6 +93,7 @@ export default function CardActionsForm() {
           value={email}
           onChangeText={setEmail}
           placeholder="ornek@eposta.com"
+          placeholderTextColor="#8a94a6"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -139,19 +142,25 @@ export default function CardActionsForm() {
       </View>
 
       <View style={styles.buttons}>
-        <TouchableOpacity
-          style={[styles.button, submitting.card && styles.buttonDisabled]}
-          onPress={handleSaveCard}
-          disabled={submitting.card}
-        >
-          <Text style={styles.buttonText}>{submitting.card ? "Gönderiliyor..." : "Kartı Kaydet"}</Text>
+        <TouchableOpacity onPress={handleSaveCard} disabled={submitting.card} activeOpacity={0.85}>
+          <LinearGradient
+            colors={["#0d1b34", "#1fb6c9"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.button, submitting.card && styles.buttonDisabled]}
+          >
+            <Text style={styles.buttonText}>{submitting.card ? "Gönderiliyor..." : "Kartı Kaydet"}</Text>
+          </LinearGradient>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, submitting.meeting && styles.buttonDisabled]}
-          onPress={handleRequestMeeting}
-          disabled={submitting.meeting}
-        >
-          <Text style={styles.buttonText}>{submitting.meeting ? "Gönderiliyor..." : "Toplantı Talep Et"}</Text>
+        <TouchableOpacity onPress={handleRequestMeeting} disabled={submitting.meeting} activeOpacity={0.85}>
+          <LinearGradient
+            colors={["#0d1b34", "#1fb6c9"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.button, submitting.meeting && styles.buttonDisabled]}
+          >
+            <Text style={styles.buttonText}>{submitting.meeting ? "Gönderiliyor..." : "Toplantı Talep Et"}</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -170,21 +179,21 @@ export default function CardActionsForm() {
 const styles = StyleSheet.create({
   form: { marginVertical: 8 },
   field: { marginBottom: 14 },
-  label: { fontSize: 13, color: "#3a3560", marginBottom: 6, fontWeight: "600" },
+  label: { fontSize: 13, color: "#33404f", marginBottom: 6, fontWeight: "600" },
   input: {
     borderWidth: 1,
-    borderColor: "#eceaf6",
+    borderColor: "#dde5ea",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     fontSize: 14,
-    color: "#1f1b3d",
-    backgroundColor: "#ffffff",
+    color: "#0d1b34",
+    backgroundColor: "#f5f8f9",
     justifyContent: "center",
   },
   inputError: { borderColor: "#e5484d" },
-  dateText: { color: "#1f1b3d", fontSize: 14 },
-  datePlaceholder: { color: "#8a86a3", fontSize: 14 },
+  dateText: { color: "#0d1b34", fontSize: 14 },
+  datePlaceholder: { color: "#8a94a6", fontSize: 14 },
   error: { color: "#e5484d", fontSize: 12, marginTop: 4 },
   consentField: { marginBottom: 16 },
   consentRow: { flexDirection: "row", alignItems: "flex-start" },
@@ -193,19 +202,19 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#6a5cff",
+    borderColor: "#1fb6c9",
     marginRight: 8,
     marginTop: 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxChecked: { backgroundColor: "#6a5cff" },
+  checkboxChecked: { backgroundColor: "#1fb6c9" },
   checkmark: { color: "#ffffff", fontSize: 12, fontWeight: "700" },
-  consentText: { flex: 1, fontSize: 12, color: "#3a3560", lineHeight: 18 },
-  consentLink: { color: "#6a5cff", fontWeight: "700", textDecorationLine: "underline" },
+  consentText: { flex: 1, fontSize: 13, color: "#33404f", lineHeight: 19.5 },
+  consentLink: { color: "#1fb6c9", fontWeight: "600", textDecorationLine: "underline" },
   buttons: { gap: 10, marginTop: 4 },
-  button: { backgroundColor: "#6a5cff", borderRadius: 12, paddingVertical: 12, alignItems: "center" },
+  button: { borderRadius: 10, paddingVertical: 12, alignItems: "center" },
   buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: "#ffffff", fontSize: 14, fontWeight: "700" },
-  statusSuccess: { color: "#1f8a4c", fontSize: 13, marginTop: 10, textAlign: "center" },
+  buttonText: { color: "#ffffff", fontSize: 13.5, fontWeight: "600" },
+  statusSuccess: { color: "#1f9d55", fontSize: 13, marginTop: 10, textAlign: "center" },
 });

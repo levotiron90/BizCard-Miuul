@@ -1,21 +1,26 @@
 import React from "react";
-import { SafeAreaView, ScrollView, StyleSheet, StatusBar } from "react-native";
+import { ScrollView, StyleSheet, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import ProfileCard from "./src/components/ProfileCard";
 import person from "./src/data/person";
 import siteUrl from "./src/data/site";
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <ProfileCard person={person} siteUrl={siteUrl} />
-      </ScrollView>
-    </SafeAreaView>
+    <LinearGradient colors={["#eef2f7", "#dbe6f0"]} style={styles.gradient}>
+      <SafeAreaView style={styles.safe}>
+        <StatusBar barStyle="dark-content" />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <ProfileCard person={person} siteUrl={siteUrl} />
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#6a5cff" },
+  gradient: { flex: 1 },
+  safe: { flex: 1 },
   scroll: { flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 20 },
 });

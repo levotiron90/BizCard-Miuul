@@ -19,15 +19,19 @@ export default function ContactList({ items }) {
 }
 
 const styles = StyleSheet.create({
-  list: { gap: 10 },
+  list: { gap: 14 },
   item: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f3f1ff",
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    gap: 12,
   },
-  icon: { marginRight: 12 },
-  label: { color: "#3a3560", fontSize: 14, flexShrink: 1 },
+  icon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "#e6f7f8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  label: { color: "#33404f", fontSize: 14.5, flexShrink: 1 },
 });

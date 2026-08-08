@@ -30,13 +30,20 @@ export default function PrivacyPolicyModal({ open, onClose }) {
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: "rgba(13,27,52,0.5)", justifyContent: "flex-end" },
-  modal: { backgroundColor: "#ffffff", borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "80%", padding: 20 },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
-  title: { fontSize: 16, fontWeight: "700", color: "#1f1b3d" },
-  close: { fontSize: 24, color: "#8a86a3" },
-  body: { marginBottom: 8 },
+  overlay: { flex: 1, backgroundColor: "rgba(13,27,52,0.6)", justifyContent: "flex-end" },
+  modal: { backgroundColor: "#ffffff", borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: "80%" },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    backgroundColor: "#0d1b34",
+  },
+  title: { fontSize: 15, fontWeight: "700", color: "#ffffff" },
+  close: { fontSize: 22, color: "#ffffff", lineHeight: 22 },
+  body: { padding: 20 },
   section: { marginBottom: 16 },
-  heading: { fontSize: 14, fontWeight: "700", color: "#3a3560", marginBottom: 6 },
-  paragraph: { fontSize: 13, color: "#3a3560", lineHeight: 19, marginBottom: 6 },
+  heading: { fontSize: 13.5, fontWeight: "700", color: "#0d1b34", marginBottom: 6 },
+  paragraph: { fontSize: 13, color: "#5a6b7a", lineHeight: 19.5, marginBottom: 6 },
 });

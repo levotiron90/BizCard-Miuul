@@ -1,13 +1,16 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { buildVCard, slugify } from "../utils/vcard";
 
 // Contacts izni istemeden (expo-contacts kullanılmıyor) kartviziti
 // telefona eklemenin yolu: .vcf dosyasını native paylaşım sayfası
 // üzerinden açmak. İzni işletim sisteminin kendi kişiler uygulaması
-// yönetir, bu uygulama CONTACTS izni istemez.
+// yönetir, bu uygulama CONTACTS izni istemez. expo-file-system'in
+// SDK 54 ile gelen yeni (File/Directory) API'si cacheDirectory /
+// writeAsStringAsync / EncodingType'ı kaldırdığı için bunlar artık
+// "expo-file-system/legacy" alt yolundan import ediliyor.
 export default function SaveToPhoneSection({ person }) {
   async function handleSave() {
     const vcard = buildVCard(person);
@@ -39,8 +42,15 @@ export default function SaveToPhoneSection({ person }) {
 
 const styles = StyleSheet.create({
   section: { alignItems: "center", marginVertical: 8 },
-  title: { fontSize: 14, fontWeight: "700", color: "#1f1b3d", marginBottom: 4 },
-  desc: { fontSize: 12, color: "#8a86a3", textAlign: "center", marginBottom: 12 },
-  button: { backgroundColor: "#f3f1ff", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 20 },
-  buttonText: { color: "#6a5cff", fontWeight: "700", fontSize: 14 },
+  title: { fontSize: 15, fontWeight: "700", color: "#0d1b34", marginBottom: 6 },
+  desc: { fontSize: 13, color: "#5a6b7a", textAlign: "center", lineHeight: 18, marginBottom: 14 },
+  button: {
+    backgroundColor: "#ffffff",
+    borderWidth: 2,
+    borderColor: "#1fb6c9",
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+  },
+  buttonText: { color: "#1fb6c9", fontWeight: "600", fontSize: 14 },
 });
