@@ -6,7 +6,7 @@
 
 ## Kapsam
 
-- Yeni, bağımsız bir Expo projesi: repo kökünde **`/app`** klasörü (kendi `package.json`, `node_modules`, `app.json`).
+- Yeni, bağımsız bir Expo projesi: repo kökünde **`/mobile`** klasörü (kendi `package.json`, `node_modules`, `app.json`).
 - Mevcut web sürümü (`react.html`, `index.html`, `card.js`, `vercel.json`, `src/data/*`) **değiştirilmez** — iki dağıtım hedefi (web + Expo Go) birbirinden bağımsız, aynı repo içinde bir arada yaşar.
 - Hedef: **Expo Go** içinde çalışmak — EAS Build / custom dev client / native prebuild gerekmez. Bu yüzden sadece Expo Go'nun zaten içerdiği modüller kullanılır.
 - **`expo-contacts` kullanılmaz** — cihazın kişiler/rehber izni hiçbir şekilde istenmez.
@@ -15,7 +15,7 @@
 ## Proje Yapısı
 
 ```
-app/
+mobile/
   App.js
   app.json
   package.json
