@@ -2,14 +2,24 @@
   "expo": {
     "name": "BizCard",
     "slug": "bizcard-mobile",
+    "owner": "levotiron90",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
-    "android": {},
-    "web": {}
+    "android": {
+      "package": "com.veriendustri.bizcard"
+    },
+    "web": {},
+    "extra": {
+      "eas": {
+        "projectId": "1892fbb3-4f4a-4390-aa41-07c1ffe0d326"
+      }
+    }
   }
 }
