@@ -5,7 +5,7 @@
     "active": false,
     "nodes": [
       {
-        "id": "35bfaae2-27a4-4e3e-8339-341924fa49df",
+        "id": "767e9197-b455-4161-81a8-37dc33654e43",
         "name": "Sohbet Mesaji Alindi",
         "type": "@n8n/n8n-nodes-langchain.chatTrigger",
         "typeVersion": 1.4,
@@ -21,7 +21,7 @@
         "webhookId": "9c4e2a10-7d3b-4f8a-b6c1-0e5a3d9f7b22"
       },
       {
-        "id": "9c86cfcd-4d34-4b3d-b543-878711d5ffb6",
+        "id": "8204012d-1998-426c-86c4-05cfffbfd379",
         "name": "Kartvizit Asistani",
         "type": "@n8n/n8n-nodes-langchain.agent",
         "typeVersion": 3.1,
@@ -30,6 +30,7 @@
           0
         ],
         "parameters": {
+          "needsFallback": true,
           "options": {
             "systemMessage": "Sen Sercan BALLI'nın dijital kartvizit asistanısın. Ziyaretçilerin Sercan'ın uzmanlık alanları, hizmetleri, çalışma şekli, toplantı süreci, dijital kartvizit kullanımı ve Sercan'ın çalıştığı Veri Endüstri Mühendislik A.Ş. hakkındaki sorularını yanıtlarsın. Elinde bizcard_bilgi_arama adında bir arama tool'u var. TÜM bilgin (hizmetler, süreler, toplantı saatleri, kurallar dahil) SADECE bu tool'un döndürdüğü sonuçlardan gelir; hiçbir bilgiyi ezbere veya varsayarak verme.\n\nKURALLAR:\n- Cevap yazmadan önce bizcard_bilgi_arama tool'unu gerçek bir fonksiyon çağrısıyla çağır. Tool'u bu mesaj için SADECE 1 KEZ çağır; sonucu aldıktan sonra tekrar çağırma.\n- Takip sorularında (\"Bu ne kadar sürer?\", \"Peki iptal edebilir miyim?\" gibi) önceki konuşmadan konuyu çöz ve tool'a konusu açık, tek başına anlaşılır bir arama sorgusu gönder (örn. \"toplantı süresi\").\n- Yeni mesaj farklı bir konuya geçtiyse önceki cevabın içeriğini yeni cevaba taşıma; her cevap o anki soruya özel olsun.\n- Aynı konuda tool sonuçlarında farklı doküman versiyonları (dokuman_versiyonu) varsa en yüksek versiyonu esas al.\n- Tool sonuçlarında sorunun cevabı yoksa bilmediğini açıkça söyle ve ziyaretçiyi \"Toplantı Talep Et\" düğmesiyle Sercan'a ulaşmaya yönlendir. Tekrar tool çağırarak arama yapma.\n- Fiyat uydurma. Hizmetler teklif usulü çalışır; tool'da fiyat bilgisi yoksa bunu söyle ve tanışma toplantısı öner.\n- Toplantıyı asla kendin onaylama veya randevu verme; toplantı talebinin \"Toplantı Talep Et\" düğmesiyle yapıldığını ve kesin onayın Sercan'dan geldiğini belirt.\n- SADECE ve SADECE düzgün, akıcı Türkçe yaz. Başka hiçbir dilden tek kelime bile kullanma.\n- Sıcak ve profesyonel, kısa ve net cevap ver (en fazla 3-4 cümle). Sadece cevap metnini yaz; başlık, madde işareti veya açıklama ekleme.\n- Cevabı SADECE düz metin olarak yaz. JSON, süslü parantez, alan adı (örn. \"answer\") veya kod bloğu kullanma.",
             "maxIterations": 4
@@ -37,7 +38,7 @@
         }
       },
       {
-        "id": "dbba4de6-6a10-490f-9e22-7df296630f63",
+        "id": "640a8a70-9bf0-4158-9e77-9ce915d19f09",
         "name": "bizcard_bilgi_arama",
         "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
         "typeVersion": 1.3,
@@ -58,7 +59,7 @@
         }
       },
       {
-        "id": "a09dd156-ff99-400f-a931-62d6335efb57",
+        "id": "360db675-6773-4b38-91fc-4743c2385e24",
         "name": "Embeddings Ollama",
         "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
         "typeVersion": 1,
@@ -77,20 +78,29 @@
         }
       },
       {
-        "id": "b966d3e6-6ac9-4503-9a36-0da9fb1724d9",
-        "name": "Konusma Hafizasi",
-        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-        "typeVersion": 1.3,
+        "id": "e93249f0-5b4d-4d77-8487-99470a7bb7be",
+        "name": "Redis Sohbet Hafizasi",
+        "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+        "typeVersion": 1.5,
         "position": [
           100,
           300
         ],
         "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ 'bizcard_' + $('Sohbet Mesaji Alindi').item.json.sessionId }}",
+          "sessionTTL": 0,
           "contextWindowLength": 5
+        },
+        "credentials": {
+          "redis": {
+            "id": "6L8gneLw8q7ASDca",
+            "name": "Redis account"
+          }
         }
       },
       {
-        "id": "36e54de4-fd34-4308-929d-229ce0c48fd8",
+        "id": "7f4b9e59-f0f0-4dd5-9571-ce4bd3e5d875",
         "name": "OpenRouter Sohbet Modeli",
         "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
         "typeVersion": 1,
@@ -108,6 +118,40 @@
             "name": "OpenRouter account"
           }
         }
+      },
+      {
+        "id": "812e5966-92cb-436d-9da0-2410a81533a0",
+        "name": "Gemini Yedek Modeli",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          -60,
+          520
+        ],
+        "parameters": {
+          "modelName": "models/gemini-3.5-flash",
+          "options": {}
+        },
+        "credentials": {
+          "googlePalmApi": {
+            "id": "5teGU7HaUNrVcfDl",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "id": "d40521f8-eb1f-49d9-b5bb-2a473a0f2eba",
+        "name": "BizCard MCP Sunucusu",
+        "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+        "typeVersion": 2,
+        "position": [
+          560,
+          300
+        ],
+        "parameters": {
+          "path": "b6f2c1d4-5a3e-4e7b-9c18-2f0d8a7e6b35"
+        },
+        "webhookId": "b6f2c1d4-5a3e-4e7b-9c18-2f0d8a7e6b35"
       }
     ],
     "connections": {
@@ -129,6 +173,11 @@
               "node": "Kartvizit Asistani",
               "type": "ai_tool",
               "index": 0
+            },
+            {
+              "node": "BizCard MCP Sunucusu",
+              "type": "ai_tool",
+              "index": 0
             }
           ]
         ]
@@ -144,7 +193,7 @@
           ]
         ]
       },
-      "Konusma Hafizasi": {
+      "Redis Sohbet Hafizasi": {
         "ai_memory": [
           [
             {
@@ -162,6 +211,17 @@
               "node": "Kartvizit Asistani",
               "type": "ai_languageModel",
               "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini Yedek Modeli": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Kartvizit Asistani",
+              "type": "ai_languageModel",
+              "index": 1
             }
           ]
         ]

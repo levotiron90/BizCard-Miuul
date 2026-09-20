@@ -5,7 +5,7 @@
     "active": false,
     "nodes": [
       {
-        "id": "b91d0729-750f-4f79-976d-6c1c60236a2f",
+        "id": "b2fbe827-7c16-47d8-a02b-76a7ec81095e",
         "name": "Dokuman Yukleme Formu",
         "type": "n8n-nodes-base.formTrigger",
         "typeVersion": 2.5,
@@ -91,7 +91,7 @@
         "webhookId": "5f0c7a52-3b1e-4c6f-9a55-2d7e8b1c4a90"
       },
       {
-        "id": "4ef940a9-2a5a-4a8c-b2c9-bf06a57ca0ed",
+        "id": "dcf4cfc4-7bad-4d60-af5b-1df36ef772f5",
         "name": "Dokumanlari Ayir",
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
@@ -104,7 +104,7 @@
         }
       },
       {
-        "id": "ba7778cc-8e7a-47bf-ad7e-ab74760e6cae",
+        "id": "3d844bf0-95aa-45b6-913d-0e47fe697934",
         "name": "Vector Store'a Yaz",
         "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
         "typeVersion": 1.3,
@@ -123,7 +123,7 @@
         }
       },
       {
-        "id": "1e482e4a-4afd-4822-919e-1bce5ef16e66",
+        "id": "09ca2c59-ea1a-4764-89c9-d5ad1878bcc6",
         "name": "Dokuman Yukleyici",
         "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
         "typeVersion": 1.1,
@@ -171,7 +171,7 @@
         }
       },
       {
-        "id": "e6fca985-be44-43b5-b4c2-30e4a9e3f11d",
+        "id": "313b40c3-d278-4837-9076-4fa58877d154",
         "name": "Metin Parcalayici",
         "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
         "typeVersion": 1,
@@ -186,7 +186,7 @@
         }
       },
       {
-        "id": "aec595bb-c68e-4d53-ae90-77a88127cef6",
+        "id": "b71950fe-cc31-4026-8c8e-412afa4f2743",
         "name": "Embeddings Ollama",
         "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
         "typeVersion": 1,

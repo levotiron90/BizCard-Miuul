@@ -39,4 +39,19 @@ function getClientIp(req) {
   return req.socket?.remoteAddress || "unknown";
 }
 
-module.exports = { isRateLimited, getClientIp };
+// Her endpoint kendi sayacını kullanır (sohbet ile webhook birbirinin limitini tüketmesin).
+function createRateLimiter(maxRequests, windowMs) {
+  const log = new Map();
+  return function isLimited(ip) {
+    const now = Date.now();
+    const entry = log.get(ip);
+    if (!entry || now - entry.windowStart > windowMs) {
+      log.set(ip, { count: 1, windowStart: now });
+      return false;
+    }
+    entry.count += 1;
+    return entry.count > maxRequests;
+  };
+}
+
+module.exports = { isRateLimited, getClientIp, createRateLimiter };

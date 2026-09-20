@@ -393,10 +393,112 @@ function ProfileCard({ person, siteUrl }) {
   );
 }
 
+// Ziyaretçi bazlı sohbet: oturum kimliği tarayıcıda saklanır, n8n tarafında Redis
+// bu kimliğe göre önceki mesajları hatırlar.
+function getChatSessionId() {
+  let id = null;
+  try {
+    id = localStorage.getItem("bizcard_chat_session");
+  } catch (err) {
+    console.warn("localStorage okunamadı:", err);
+  }
+  if (!id) {
+    id = `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    try {
+      localStorage.setItem("bizcard_chat_session", id);
+    } catch (err) {
+      console.warn("localStorage'a yazılamadı:", err);
+    }
+  }
+  return id;
+}
+
+// Gerçek n8n adresi tarayıcıya gönderilmez: istek aynı origin'deki /api/chat'e gider.
+async function sendChatMessage(sessionId, chatInput) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, chatInput }),
+  });
+  if (!response.ok) throw new Error("Sohbet isteği başarısız: " + response.status);
+  const data = await response.json();
+  return data.output;
+}
+
+function ChatWidget() {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    { role: "bot", text: "Merhaba! Ben Sercan BALLI'nın dijital kartvizit asistanıyım. Hizmetler, toplantı süreci ve Veri Endüstri hakkında soru sorabilirsiniz." },
+  ]);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const sessionIdRef = React.useRef(null);
+  const endRef = React.useRef(null);
+
+  if (!sessionIdRef.current) sessionIdRef.current = getChatSessionId();
+
+  React.useEffect(() => {
+    if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages, sending]);
+
+  async function handleSend(e) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || sending) return;
+    setMessages((prev) => [...prev, { role: "user", text }]);
+    setInput("");
+    setSending(true);
+    try {
+      const output = await sendChatMessage(sessionIdRef.current, text);
+      setMessages((prev) => [...prev, { role: "bot", text: output }]);
+    } catch (err) {
+      console.warn("Sohbet mesajı gönderilemedi:", err);
+      setMessages((prev) => [...prev, { role: "error", text: "Üzgünüm, şu anda cevap veremiyorum. Lütfen daha sonra tekrar deneyin." }]);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <>
+      {open && (
+        <div className="chat-panel" role="dialog" aria-label="BizCard sohbet asistanı">
+          <div className="chat-panel-header">
+            <div>
+              <strong>BizCard Asistanı</strong>
+              <span>Hizmetler ve toplantı süreci hakkında sorabilirsiniz</span>
+            </div>
+            <button type="button" className="chat-close-btn" onClick={() => setOpen(false)} aria-label="Sohbeti kapat">✕</button>
+          </div>
+          <div className="chat-messages">
+            {messages.map((msg, i) => (
+              <div key={i} className={`chat-msg ${msg.role}`}>{msg.text}</div>
+            ))}
+            {sending && <div className="chat-typing"><span></span><span></span><span></span></div>}
+            <div ref={endRef} />
+          </div>
+          <form className="chat-input-row" onSubmit={handleSend}>
+            <input id="chat-input" type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Bir soru yazın..." disabled={sending} maxLength={500} />
+            <button type="submit" className="chat-send-btn" disabled={sending || !input.trim()} aria-label="Gönder">➤</button>
+          </form>
+        </div>
+      )}
+      <button type="button" className="chat-fab" onClick={() => setOpen((v) => !v)} aria-label={open ? "Sohbeti kapat" : "Sohbeti aç"}>
+        {open ? "✕" : "💬"}
+      </button>
+    </>
+  );
+}
+
 function App() {
   const [person] = useState(window.BIZCARD_PERSON);
 
-  return <ProfileCard person={person} siteUrl={window.BIZCARD_SITE_URL} />;
+  return (
+    <>
+      <ProfileCard person={person} siteUrl={window.BIZCARD_SITE_URL} />
+      <ChatWidget />
+    </>
+  );
 }
 
 const root = createRoot(document.getElementById("root"));
