@@ -1,76 +1,108 @@
-[
-  {
-    "id": "BzDogrulama00001",
-    "name": "BizCard - Dogrulama",
-    "active": false,
-    "nodes": [
-      {
-        "id": "f0bbe25e-8664-4ece-a4c9-447c25cac56d",
-        "name": "Baska Workflow Tarafindan Cagrildi",
-        "type": "n8n-nodes-base.executeWorkflowTrigger",
-        "typeVersion": 1.1,
-        "position": [
-          0,
-          0
-        ],
-        "parameters": {
-          "workflowInputs": {
-            "values": [
-              {
-                "name": "event"
-              },
-              {
-                "name": "cardId"
-              },
-              {
-                "name": "email"
-              },
-              {
-                "name": "timestamp"
-              },
-              {
-                "name": "preferredDate"
-              },
-              {
-                "name": "preferredTime"
-              }
-            ]
-          }
-        }
-      },
-      {
-        "id": "44fed1a1-55f1-4b0f-9d25-150cac541255",
-        "name": "Girdileri Dogrula",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          240,
-          0
-        ],
-        "parameters": {
-          "jsCode": "// BizCard ortak dogrulama: \"Karti Kaydet\" ve \"Toplanti Talep Et\" akislari ayni kurallari kullanir.\nconst EMAIL_REGEX = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nconst DATE_REGEX = /^\\d{4}-\\d{2}-\\d{2}$/;\nconst TIME_REGEX = /^([01]\\d|2[0-3]):[0-5]\\d$/;\nconst VALID_EVENTS = [\"card.save\", \"meeting.request\"];\nconst VALID_CARD_IDS = [\"sercan-balli\"];\nconst item = $input.first().json;\nconst errors = [];\nif (!VALID_EVENTS.includes(item.event)) { errors.push(\"Gecersiz olay turu: \" + item.event); }\nif (!VALID_CARD_IDS.includes(item.cardId)) { errors.push(\"Bilinmeyen kart ID: \" + item.cardId); }\nif (!item.email || !EMAIL_REGEX.test(item.email)) { errors.push(\"Gecersiz e-posta formati: \" + item.email); }\nif (!item.timestamp || isNaN(Date.parse(item.timestamp))) { errors.push(\"Gecersiz zaman damgasi: \" + item.timestamp); }\nif (item.event === \"meeting.request\") {\n  if (!DATE_REGEX.test(item.preferredDate || \"\")) { errors.push(\"Gecersiz toplanti tarihi: \" + item.preferredDate); }\n  if (!TIME_REGEX.test(item.preferredTime || \"\")) { errors.push(\"Gecersiz toplanti saati: \" + item.preferredTime); }\n}\nreturn [{ json: { valid: errors.length === 0, reason: errors.join(\" | \") } }];"
-        }
-      }
-    ],
-    "connections": {
-      "Baska Workflow Tarafindan Cagrildi": {
-        "main": [
-          [
+{
+  "updatedAt": "2026-09-20T12:05:31.000Z",
+  "createdAt": "2026-09-20T10:13:07.284Z",
+  "id": "BzDogrulama00001",
+  "name": "BizCard - Dogrulama",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "f0bbe25e-8664-4ece-a4c9-447c25cac56d",
+      "name": "Baska Workflow Tarafindan Cagrildi",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
             {
-              "node": "Girdileri Dogrula",
-              "type": "main",
-              "index": 0
+              "name": "event"
+            },
+            {
+              "name": "cardId"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "timestamp"
+            },
+            {
+              "name": "preferredDate"
+            },
+            {
+              "name": "preferredTime"
             }
           ]
-        ]
+        }
       }
     },
-    "settings": {
-      "executionOrder": "v1",
-      "timezone": "Europe/Istanbul",
-      "callerPolicy": "workflowsFromSameOwner",
-      "errorWorkflow": "BzHataBildirim01"
-    },
-    "pinData": {}
+    {
+      "id": "44fed1a1-55f1-4b0f-9d25-150cac541255",
+      "name": "Girdileri Dogrula",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// BizCard ortak dogrulama: \"Karti Kaydet\" ve \"Toplanti Talep Et\" akislari ayni kurallari kullanir.\nconst EMAIL_REGEX = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nconst DATE_REGEX = /^\\d{4}-\\d{2}-\\d{2}$/;\nconst TIME_REGEX = /^([01]\\d|2[0-3]):[0-5]\\d$/;\nconst VALID_EVENTS = [\"card.save\", \"meeting.request\"];\nconst VALID_CARD_IDS = [\"sercan-balli\"];\nconst item = $input.first().json;\nconst errors = [];\nif (!VALID_EVENTS.includes(item.event)) { errors.push(\"Gecersiz olay turu: \" + item.event); }\nif (!VALID_CARD_IDS.includes(item.cardId)) { errors.push(\"Bilinmeyen kart ID: \" + item.cardId); }\nif (!item.email || !EMAIL_REGEX.test(item.email)) { errors.push(\"Gecersiz e-posta formati: \" + item.email); }\nif (!item.timestamp || isNaN(Date.parse(item.timestamp))) { errors.push(\"Gecersiz zaman damgasi: \" + item.timestamp); }\nif (item.event === \"meeting.request\") {\n  if (!DATE_REGEX.test(item.preferredDate || \"\")) { errors.push(\"Gecersiz toplanti tarihi: \" + item.preferredDate); }\n  if (!TIME_REGEX.test(item.preferredTime || \"\")) { errors.push(\"Gecersiz toplanti saati: \" + item.preferredTime); }\n}\nreturn [{ json: { valid: errors.length === 0, reason: errors.join(\" | \") } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Baska Workflow Tarafindan Cagrildi": {
+      "main": [
+        [
+          {
+            "node": "Girdileri Dogrula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Istanbul",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "BzHataBildirim01"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "3d8eed05-7681-4612-a589-52106de0bb85",
+  "activeVersionId": "3d8eed05-7681-4612-a589-52106de0bb85",
+  "versionCounter": 19,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-09-20T10:13:07.291Z",
+      "createdAt": "2026-09-20T10:13:07.291Z",
+      "role": "workflow:owner",
+      "workflowId": "BzDogrulama00001",
+      "projectId": "y2PmF33miy1sfEG4",
+      "project": {
+        "updatedAt": "2026-08-10T17:08:13.066Z",
+        "createdAt": "2026-07-15T18:47:06.820Z",
+        "id": "y2PmF33miy1sfEG4",
+        "name": "Sercan Ballı <levotiron90@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "fad24d8e-b4c9-4fe0-9fd3-7b150803ae24"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
   }
-]
+}

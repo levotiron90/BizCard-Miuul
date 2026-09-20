@@ -1,0 +1,127 @@
+{
+  "updatedAt": "2026-09-20T13:44:56.326Z",
+  "createdAt": "2026-09-20T13:44:56.326Z",
+  "id": "BzN8nApiSorgu001",
+  "name": "BizCard - n8n API Sorgu (Haftalik Talep Sayisi)",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "bb1aa9d2-c4cf-4166-88d7-fbe5e2d805bd",
+      "name": "Manuel Calistir",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4338c293-47e5-4dd7-b080-eb7ec83c936c",
+      "name": "n8n API - Webhook Calistirmalari",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "resource": "execution",
+        "returnAll": true,
+        "filters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "jtJeOgCaHaHJp8mU",
+            "mode": "list",
+            "cachedResultName": "BizCard - Webhook (#jtJeOgCaHaHJp8mU)"
+          }
+        },
+        "options": {
+          "activeWorkflows": true
+        },
+        "requestOptions": {}
+      },
+      "credentials": {
+        "n8nApi": {
+          "id": "6J81WVRmDZc0IwOD",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "id": "e0dca40f-9cc7-49db-8c9a-f5af71d738ed",
+      "name": "Haftalik Sayilari Hesapla",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// n8n API'den gelen execution'lari bu haftaya (Pazartesi 00:00'dan itibaren) filtreleyip olay turune gore sayar.\nconst weekStart = $now.startOf(\"week\");\nconst sonuc = { haftaBaslangici: weekStart.toFormat(\"yyyy-MM-dd\"), buHaftaToplamIstek: 0, kartKaydi: 0, toplantiTalebi: 0, basarisiz: 0, tumZamanlarToplantiTalebi: 0 };\nfor (const item of $input.all()) {\n  const j = item.json;\n  const raw = JSON.stringify(j.data || {});\n  const toplanti = raw.includes(\"meeting.request\");\n  const kart = raw.includes(\"card.save\");\n  if (toplanti) sonuc.tumZamanlarToplantiTalebi++;\n  if (DateTime.fromISO(j.startedAt) < weekStart) continue;\n  sonuc.buHaftaToplamIstek++;\n  if (toplanti) sonuc.toplantiTalebi++;\n  else if (kart) sonuc.kartKaydi++;\n  if (j.status === \"error\") sonuc.basarisiz++;\n}\nreturn [{ json: sonuc }];"
+      }
+    }
+  ],
+  "connections": {
+    "Manuel Calistir": {
+      "main": [
+        [
+          {
+            "node": "n8n API - Webhook Calistirmalari",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n API - Webhook Calistirmalari": {
+      "main": [
+        [
+          {
+            "node": "Haftalik Sayilari Hesapla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Istanbul",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "757599f2-7143-448a-90d2-bf2fc17ef82a",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-09-20T13:44:56.329Z",
+      "createdAt": "2026-09-20T13:44:56.329Z",
+      "role": "workflow:owner",
+      "workflowId": "BzN8nApiSorgu001",
+      "projectId": "y2PmF33miy1sfEG4",
+      "project": {
+        "updatedAt": "2026-08-10T17:08:13.066Z",
+        "createdAt": "2026-07-15T18:47:06.820Z",
+        "id": "y2PmF33miy1sfEG4",
+        "name": "Sercan Ballı <levotiron90@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "fad24d8e-b4c9-4fe0-9fd3-7b150803ae24"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

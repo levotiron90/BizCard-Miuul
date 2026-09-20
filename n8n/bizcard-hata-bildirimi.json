@@ -1,141 +1,173 @@
-[
-  {
-    "id": "BzHataBildirim01",
-    "name": "BizCard - Hata Bildirimi",
-    "active": false,
-    "nodes": [
-      {
-        "id": "5919d67d-9d61-4345-8a1d-3ba92ed26898",
-        "name": "Hata Tetikleyici",
-        "type": "n8n-nodes-base.errorTrigger",
-        "typeVersion": 1,
-        "position": [
-          0,
-          0
-        ],
-        "parameters": {}
-      },
-      {
-        "id": "8651a5a9-104c-434b-a759-6aa52cee0987",
-        "name": "Hatayi Sheete Yaz",
-        "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.7,
-        "position": [
-          240,
-          0
-        ],
-        "parameters": {
-          "operation": "append",
-          "documentId": {
-            "__rl": true,
-            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
-            "mode": "id"
-          },
-          "sheetName": {
-            "__rl": true,
-            "value": "BizCard - Hatalar",
-            "mode": "name"
-          },
-          "columns": {
-            "mappingMode": "defineBelow",
-            "value": {
-              "timestamp": "={{ $now.toISO() }}",
-              "workflowName": "={{ $json.workflow.name }}",
-              "nodeName": "={{ $json.execution.lastNodeExecuted }}",
-              "errorMessage": "={{ $json.execution.error.message }}",
-              "executionUrl": "={{ $json.execution.url }}",
-              "inputData": "={{ JSON.stringify($json.execution.error) }}"
-            },
-            "matchingColumns": [],
-            "schema": [
-              {
-                "id": "timestamp",
-                "displayName": "timestamp",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "workflowName",
-                "displayName": "workflowName",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "nodeName",
-                "displayName": "nodeName",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "errorMessage",
-                "displayName": "errorMessage",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "executionUrl",
-                "displayName": "executionUrl",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "inputData",
-                "displayName": "inputData",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true
-              }
-            ],
-            "attemptToConvertTypes": false,
-            "convertFieldsToString": false
-          },
-          "options": {
-            "cellFormat": "RAW"
-          }
+{
+  "updatedAt": "2026-09-20T12:05:34.000Z",
+  "createdAt": "2026-09-20T10:13:09.884Z",
+  "id": "BzHataBildirim01",
+  "name": "BizCard - Hata Bildirimi",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "5919d67d-9d61-4345-8a1d-3ba92ed26898",
+      "name": "Hata Tetikleyici",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8651a5a9-104c-434b-a759-6aa52cee0987",
+      "name": "Hatayi Sheete Yaz",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+          "mode": "id"
         },
-        "credentials": {
-          "googleSheetsOAuth2Api": {
-            "id": "62mvKg7CLJ6NMmMZ",
-            "name": "Google Sheets account"
-          }
+        "sheetName": {
+          "__rl": true,
+          "value": "BizCard - Hatalar",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $now.toISO() }}",
+            "workflowName": "={{ $json.workflow.name }}",
+            "nodeName": "={{ $json.execution.lastNodeExecuted }}",
+            "errorMessage": "={{ $json.execution.error.message }}",
+            "executionUrl": "={{ $json.execution.url }}",
+            "inputData": "={{ JSON.stringify($json.execution.error) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflowName",
+              "displayName": "workflowName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nodeName",
+              "displayName": "nodeName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "errorMessage",
+              "displayName": "errorMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "executionUrl",
+              "displayName": "executionUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "inputData",
+              "displayName": "inputData",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "62mvKg7CLJ6NMmMZ",
+          "name": "Google Sheets account"
         }
       }
-    ],
-    "connections": {
-      "Hata Tetikleyici": {
-        "main": [
-          [
-            {
-              "node": "Hatayi Sheete Yaz",
-              "type": "main",
-              "index": 0
-            }
-          ]
+    }
+  ],
+  "connections": {
+    "Hata Tetikleyici": {
+      "main": [
+        [
+          {
+            "node": "Hatayi Sheete Yaz",
+            "type": "main",
+            "index": 0
+          }
         ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Istanbul",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "5f0e7153-f05b-407e-92d6-6739b33fd428",
+  "activeVersionId": "5f0e7153-f05b-407e-92d6-6739b33fd428",
+  "versionCounter": 19,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-09-20T10:13:09.889Z",
+      "createdAt": "2026-09-20T10:13:09.889Z",
+      "role": "workflow:owner",
+      "workflowId": "BzHataBildirim01",
+      "projectId": "y2PmF33miy1sfEG4",
+      "project": {
+        "updatedAt": "2026-08-10T17:08:13.066Z",
+        "createdAt": "2026-07-15T18:47:06.820Z",
+        "id": "y2PmF33miy1sfEG4",
+        "name": "Sercan Ballı <levotiron90@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "fad24d8e-b4c9-4fe0-9fd3-7b150803ae24"
       }
-    },
-    "settings": {
-      "executionOrder": "v1",
-      "timezone": "Europe/Istanbul",
-      "callerPolicy": "workflowsFromSameOwner"
-    },
-    "pinData": {}
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
   }
-]
+}
