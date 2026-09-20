@@ -112,10 +112,30 @@ function PrivacyPolicyModal({ open, onClose }) {
   );
 }
 
+const MEETING_TIMES = ["10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
+
+// Webhook sözleşmesi (bkz. bizcard-conventions): iki olay da aynı zarfı kullanır,
+// sadece "data" alanı değişir. Adres src/data/webhooks.js dosyasından gelir.
+async function sendToWebhook(url, event, person, visitor, data) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event,
+      cardId: person.cardId,
+      timestamp: new Date().toISOString(),
+      visitor: { name: visitor.name, email: visitor.email, phone: null },
+      data,
+    }),
+  });
+  if (!response.ok) throw new Error("Webhook isteği başarısız: " + response.status);
+}
+
 function CardActionsForm({ person }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState({ card: false, meeting: false });
@@ -134,10 +154,22 @@ function CardActionsForm({ person }) {
     return nextErrors;
   }
 
-  // Butonlar henüz bir webhook'a bağlı değil (n8n entegrasyonu sonraya
-  // planlanıyor); şimdilik yalnızca alanları doğrulayıp sonucu gösteriyoruz.
-  // Gönderim sırasında ilgili buton kısa süreliğine kilitlenir, böylece
-  // art arda tıklanarak birden fazla kez tetiklenmesi engellenir.
+  // Butonlar n8n webhook'una bağlıdır (src/data/webhooks.js). Gönderim
+  // sırasında ilgili buton kilitlenir, böylece art arda tıklanarak birden
+  // fazla kez tetiklenmesi engellenir.
+  async function submitToWebhook(action, url, event, data) {
+    setSubmitting((prev) => ({ ...prev, [action]: true }));
+    try {
+      await sendToWebhook(url, event, person, { name: name.trim(), email: email.trim() }, data);
+      setStatus({ action, state: "success" });
+    } catch (err) {
+      console.warn(err);
+      setStatus({ action, state: "error" });
+    } finally {
+      setSubmitting((prev) => ({ ...prev, [action]: false }));
+    }
+  }
+
   function handleSaveCard() {
     const nextErrors = validateContact();
     setErrors(nextErrors);
@@ -146,11 +178,7 @@ function CardActionsForm({ person }) {
       return;
     }
 
-    setSubmitting((prev) => ({ ...prev, card: true }));
-    setTimeout(() => {
-      setSubmitting((prev) => ({ ...prev, card: false }));
-      setStatus({ action: "card", state: "success" });
-    }, 600);
+    submitToWebhook("card", window.BIZCARD_WEBHOOKS.cardSave, "card.save", { note: null });
   }
 
   function handleRequestMeeting() {
@@ -160,17 +188,18 @@ function CardActionsForm({ person }) {
     } else if (date < todayISODate()) {
       nextErrors.date = "Geçmiş bir tarih seçemezsiniz.";
     }
+    if (!time) nextErrors.time = "Lütfen bir saat seçin.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       setStatus(null);
       return;
     }
 
-    setSubmitting((prev) => ({ ...prev, meeting: true }));
-    setTimeout(() => {
-      setSubmitting((prev) => ({ ...prev, meeting: false }));
-      setStatus({ action: "meeting", state: "success" });
-    }, 600);
+    submitToWebhook("meeting", window.BIZCARD_WEBHOOKS.meetingRequest, "meeting.request", {
+      preferredDate: date,
+      preferredTime: time,
+      message: null,
+    });
   }
 
   return (
@@ -212,6 +241,22 @@ function CardActionsForm({ person }) {
           onChange={(e) => setDate(e.target.value)}
         />
         {errors.date && <div className="form-error">{errors.date}</div>}
+      </div>
+
+      <div className="form-field">
+        <label className="form-label" htmlFor="visitor-time">Saat</label>
+        <select
+          id="visitor-time"
+          className={errors.time ? "form-input form-input-error" : "form-input"}
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+        >
+          <option value="">Saat seçin</option>
+          {MEETING_TIMES.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+        {errors.time && <div className="form-error">{errors.time}</div>}
       </div>
 
       <div className="form-field consent-field">
@@ -262,6 +307,9 @@ function CardActionsForm({ person }) {
       )}
       {status && status.action === "meeting" && status.state === "success" && (
         <div className="form-status form-status-success">Toplantı talebiniz alındı, teşekkürler!</div>
+      )}
+      {status && status.state === "error" && (
+        <div className="form-status form-status-error">Gönderilemedi, lütfen biraz sonra tekrar deneyin.</div>
       )}
 
       <PrivacyPolicyModal open={showPolicy} onClose={() => setShowPolicy(false)} />

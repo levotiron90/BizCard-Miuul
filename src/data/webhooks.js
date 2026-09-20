@@ -1,4 +1,6 @@
+// Her iki olay da aynı origin'deki /api/webhook fonksiyonuna gider; gerçek n8n adresi
+// tarayıcıya hiç gönderilmez (Vercel ortam değişkeni WEBHOOK_URL'de tutulur).
 window.BIZCARD_WEBHOOKS = {
-  cardSave: "https://example.com/webhooks/card-save",
-  meetingRequest: "https://example.com/webhooks/meeting-request",
+  cardSave: "/api/webhook",
+  meetingRequest: "/api/webhook",
 };

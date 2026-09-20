@@ -18,5 +18,5 @@ Sıcak ve profesyonel. Aşırı resmi değil, aşırı gündelik de değil.
 - Görsel olarak sade-kalabalık değil.
 
 ## Kısıtlar
-- Bu aşamada backend/veritabanı yok.
+- Veritabanı yok. Tek backend: Vercel'deki `api/webhook.js` proxy'si; o da n8n webhook'una (yerel Docker + Cloudflare Quick Tunnel) iletir. Workflow'lar `n8n/` klasöründe (bkz. `n8n/README.md`).
 - Gerçek iletişim bilgileri yerine örnek (demo) veri kullan.

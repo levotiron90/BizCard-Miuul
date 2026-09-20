@@ -1,4 +1,5 @@
 window.BIZCARD_PERSON = {
+  cardId: "sercan-balli",
   name: "Sercan BALLI",
   title: "Industrial Digitalization & Analytics Engineer",
   company: "Veri Endüstri Mühendislik A.Ş.",

@@ -1,0 +1,824 @@
+[
+  {
+    "id": "jtJeOgCaHaHJp8mU",
+    "name": "BizCard - Webhook",
+    "active": false,
+    "nodes": [
+      {
+        "id": "592b8319-c1d7-44d2-a198-46c26f0c258e",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "bizcard-webhook",
+          "options": {}
+        },
+        "webhookId": "446cdc6c-0b36-47e7-b3dc-4a99df0689d7"
+      },
+      {
+        "id": "3915f38c-71bf-4dbb-a3fa-943f42eaedce",
+        "name": "Alanlari Duzenle",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          240,
+          0
+        ],
+        "parameters": {
+          "mode": "manual",
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a1",
+                "name": "event",
+                "value": "={{ $json.body.event }}",
+                "type": "string"
+              },
+              {
+                "id": "a2",
+                "name": "cardId",
+                "value": "={{ $json.body.cardId }}",
+                "type": "string"
+              },
+              {
+                "id": "a3",
+                "name": "timestamp",
+                "value": "={{ $json.body.timestamp }}",
+                "type": "string"
+              },
+              {
+                "id": "a4",
+                "name": "tarih",
+                "value": "={{ DateTime.fromISO($json.body.timestamp).setZone('Europe/Istanbul').toFormat('yyyy-MM-dd HH:mm:ss') }}",
+                "type": "string"
+              },
+              {
+                "id": "a5",
+                "name": "name",
+                "value": "={{ $json.body.visitor?.name ?? '' }}",
+                "type": "string"
+              },
+              {
+                "id": "a6",
+                "name": "email",
+                "value": "={{ $json.body.visitor?.email ?? '' }}",
+                "type": "string"
+              },
+              {
+                "id": "a7",
+                "name": "phone",
+                "value": "={{ $json.body.visitor?.phone ?? '' }}",
+                "type": "string"
+              },
+              {
+                "id": "a8",
+                "name": "note",
+                "value": "={{ $json.body.data?.note ?? '' }}",
+                "type": "string"
+              },
+              {
+                "id": "a9",
+                "name": "preferredDate",
+                "value": "={{ $json.body.data?.preferredDate ?? '' }}",
+                "type": "string"
+              },
+              {
+                "id": "a10",
+                "name": "preferredTime",
+                "value": "={{ $json.body.data?.preferredTime ?? '' }}",
+                "type": "string"
+              },
+              {
+                "id": "a11",
+                "name": "message",
+                "value": "={{ $json.body.data?.message ?? '' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "0c6f5ca3-ba7b-432f-a2be-304d8fee3147",
+        "name": "Ortak Dogrulamayi Cagir",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          480,
+          0
+        ],
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "BzDogrulama00001",
+            "mode": "list",
+            "cachedResultName": "BizCard - Dogrulama"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "event": "={{ $json.event }}",
+              "cardId": "={{ $json.cardId }}",
+              "email": "={{ $json.email }}",
+              "timestamp": "={{ $json.timestamp }}",
+              "preferredDate": "={{ $json.preferredDate }}",
+              "preferredTime": "={{ $json.preferredTime }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "event",
+                "displayName": "event",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "cardId",
+                "displayName": "cardId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "timestamp",
+                "displayName": "timestamp",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "preferredDate",
+                "displayName": "preferredDate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "preferredTime",
+                "displayName": "preferredTime",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "24860a16-348f-4bd2-bbff-7879935bb918",
+        "name": "Gecerli mi?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          720,
+          0
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "004749d0-be5f-47ac-b698-90ad847322a1",
+                "leftValue": "={{ $json.valid }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "298ecbf7-8233-422b-bb87-04313cdea311",
+        "name": "Gecersiz Istegi Durdur",
+        "type": "n8n-nodes-base.stopAndError",
+        "typeVersion": 1,
+        "position": [
+          960,
+          200
+        ],
+        "parameters": {
+          "errorMessage": "={{ 'BizCard dogrulama hatasi: ' + $json.reason }}"
+        }
+      },
+      {
+        "id": "2a2f3224-dcb4-4b10-94e4-88c4f16ad5fb",
+        "name": "Olay Turu",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          960,
+          -100
+        ],
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "17d0d216-956c-4e4f-9de9-422d2518f84b",
+                      "leftValue": "={{ $('Alanlari Duzenle').first().json.event }}",
+                      "rightValue": "card.save",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Kart Kaydet"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "6bdd14d3-dd54-4feb-945b-a708edc4c288",
+                      "leftValue": "={{ $('Alanlari Duzenle').first().json.event }}",
+                      "rightValue": "meeting.request",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Toplanti Talebi"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "92b7c1b4-ac3d-4598-8bda-8b097ae94499",
+        "name": "Tesekkur Maili Yaz",
+        "type": "@n8n/n8n-nodes-langchain.ollama",
+        "typeVersion": 1,
+        "position": [
+          1200,
+          -260
+        ],
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "llama3.2:latest",
+            "mode": "list",
+            "cachedResultName": "llama3.2:latest"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "=Sen Sercan BALLI'nın dijital kartvizit asistanısın. Bir ziyaretçi Sercan'ın dijital kartvizitini kaydetti ve iletişim bilgilerini paylaştı.\n\nKURALLAR:\n- SADECE ve SADECE düzgün, akıcı Türkçe yaz. Başka hiçbir dilden tek kelime bile kullanma.\n- Kısa, net ve gramer hatasız cümleler kur. Anlamsız veya karışık kelimeler üretme.\n- Sıcak ve profesyonel bir ton kullan; aşırı resmi veya aşırı gündelik olma.\n- Tahmini dönüş süresi olarak SADECE \"en geç 1 iş günü\" ifadesini kullan, başka süre uydurma.\n- Sadece e-posta metnini yaz, başlık veya açıklama ekleme.\n\nÖrnek biçim (bunu birebir taklit et, sadece köşeli parantez içindeki bilgiyi değiştir):\nMerhaba [Ad],\n\nDijital kartvizitimi kaydettiğiniz için teşekkür ederim. Bilgileriniz bana ulaştı; en geç 1 iş günü içinde sizinle iletişime geçeceğim.\n\nSevgiler,\nSercan BALLI\n\nŞimdi aşağıdaki bilgilerle tam bu formatta bir e-posta yaz:\nZiyaretçi adı: {{ $('Alanlari Duzenle').first().json.name }}"
+              }
+            ]
+          },
+          "simplify": false,
+          "options": {
+            "temperature": 0.3,
+            "top_p": 0.5
+          }
+        },
+        "credentials": {
+          "ollamaApi": {
+            "id": "DaoWAC6jdCxz0rqu",
+            "name": "Ollama account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "98500af3-40bd-4c5f-abb2-fee43cc8dbdd",
+        "name": "Kart Kaydini Sheete Yaz",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1440,
+          -260
+        ],
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "BizCard - Kart Kaydetme",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Tarih": "={{ $('Alanlari Duzenle').first().json.tarih }}",
+              "Ad Soyad": "={{ $('Alanlari Duzenle').first().json.name }}",
+              "E-posta": "={{ $('Alanlari Duzenle').first().json.email }}",
+              "Telefon": "={{ $('Alanlari Duzenle').first().json.phone }}",
+              "Not": "={{ $('Alanlari Duzenle').first().json.note }}",
+              "AI Mesaji": "={{ $('Tesekkur Maili Yaz').first().json.message?.content ?? '' }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Tarih",
+                "displayName": "Tarih",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Ad Soyad",
+                "displayName": "Ad Soyad",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "E-posta",
+                "displayName": "E-posta",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Telefon",
+                "displayName": "Telefon",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Not",
+                "displayName": "Not",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "AI Mesaji",
+                "displayName": "AI Mesaji",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "RAW"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "62mvKg7CLJ6NMmMZ",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "id": "049dd7c4-737a-4a48-aeb4-2db31e823c3b",
+        "name": "Kart Tesekkur Maili Gonder",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1680,
+          -260
+        ],
+        "parameters": {
+          "sendTo": "={{ $('Alanlari Duzenle').first().json.email }}",
+          "subject": "Sercan BALLI - Kartvizit Kaydınız İçin Teşekkürler",
+          "emailType": "text",
+          "message": "={{ $('Tesekkur Maili Yaz').first().json.message?.content || 'Merhaba ' + $('Alanlari Duzenle').first().json.name + ',\\n\\nDijital kartvizitimi kaydettiğiniz için teşekkür ederim. Bilgileriniz bana ulaştı; en geç 1 iş günü içinde sizinle iletişime geçeceğim.\\n\\nSevgiler,\\nSercan BALLI' }}",
+          "options": {}
+        },
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "EIyChTifK4SSOIws",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "id": "386f8292-3739-4715-97e6-de46b32a0f17",
+        "name": "Toplanti Asistani",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          1200,
+          260
+        ],
+        "parameters": {
+          "promptType": "define",
+          "text": "=Ziyaretçi adı: {{ $('Alanlari Duzenle').first().json.name }}\nTalep edilen tarih: {{ $('Alanlari Duzenle').first().json.preferredDate }}\nTalep edilen saat: {{ $('Alanlari Duzenle').first().json.preferredTime }}\nZiyaretçi mesajı: {{ $('Alanlari Duzenle').first().json.message }}",
+          "options": {
+            "systemMessage": "Sen Sercan BALLI'nın dijital kartvizit asistanısın. Ziyaretçiler kartvizit üzerinden toplantı talep ediyor. Elinde musait_saat_kontrol adında bir tool var; girdi olarak \"YYYY-MM-DD HH:MM\" biçiminde talep edilen tarih ve saati alır, o saatin müsait olup olmadığını ve gerekirse tek bir alternatif saati döndürür.\n\nKURALLAR:\n- Cevap yazmadan önce HER ZAMAN musait_saat_kontrol tool'unu gerçek bir fonksiyon çağrısıyla çağır (tool çağrısını asla düz metin veya JSON olarak yazma). Tool'u SADECE 1 KEZ çağır.\n- Tool talepMusait: true dönerse: talep edilen tarih ve saati aynen yaz ve bu saatin uygun göründüğünü belirt. Toplantıyı kesin onaylama; Sercan'ın en geç 1 iş günü içinde kesin dönüş yapacağını yaz.\n- Tool talepMusait: false dönerse: talep edilen saatin dolu olduğunu yaz ve SADECE tool'un döndürdüğü tek alternatifi (alternatifTarih ve alternatifSaat) öner. Asla kendi kafandan tarih veya saat uydurma, asla birden fazla alternatif önerme.\n- SADECE ve SADECE düzgün, akıcı Türkçe yaz. Başka hiçbir dilden tek kelime bile kullanma.\n- Kısa, net ve gramer hatasız cümleler kur. Sıcak ve profesyonel bir ton kullan.\n- Sadece e-posta metnini yaz, başlık veya açıklama ekleme.\n\nÖrnek biçim 1 (talepMusait: true):\nMerhaba [Ad],\n\nToplantı talebinizi aldım. [Tarih] saat [Saat] bana uygun görünüyor; en geç 1 iş günü içinde kesin dönüş yapacağım.\n\nSevgiler,\nSercan BALLI\n\nÖrnek biçim 2 (talepMusait: false):\nMerhaba [Ad],\n\nToplantı talebinizi aldım. [Tarih] saat [Saat] için takvimim dolu. Bunun yerine [AlternatifTarih] saat [AlternatifSaat] uygun olabilir; en geç 1 iş günü içinde kesin dönüş yapacağım.\n\nSevgiler,\nSercan BALLI",
+            "maxIterations": 4
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "40d63bf2-2128-4ae2-a201-5bd41b40652c",
+        "name": "Musait Saat Kontrol",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          1140,
+          520
+        ],
+        "parameters": {
+          "name": "musait_saat_kontrol",
+          "description": "Sercan'ın takviminde talep edilen toplantı saatinin müsait olup olmadığını kontrol eder. Girdi olarak 'YYYY-MM-DD HH:MM' biçiminde talep edilen tarih ve saati al. Talep müsaitse talepMusait: true, değilse talepMusait: false ve tek bir alternatifTarih / alternatifSaat döndürür.",
+          "jsCode": "// Sercan'in demo takvimi: hafta ici gunleri, yarindan itibaren 21 gun.\n// Gunluk saatler: 10:00, 11:00, 13:00, 14:00, 15:00, 16:00. Carsamba 10:00-11:00 ve Cuma 15:00-16:00 dolu.\nconst q = String(query || \"\");\nconst dateMatch = q.match(/\\d{4}-\\d{2}-\\d{2}/);\nconst timeMatch = q.match(/\\b([01]?\\d|2[0-3]):[0-5]\\d\\b/);\nconst reqDate = dateMatch ? dateMatch[0] : null;\nconst reqTime = timeMatch ? timeMatch[0].padStart(5, \"0\") : null;\nconst toMin = (t) => parseInt(t.slice(0, 2)) * 60 + parseInt(t.slice(3, 5));\nconst today = new Date().toLocaleDateString(\"sv-SE\", { timeZone: \"Europe/Istanbul\" });\nconst base = new Date(today + \"T00:00:00Z\");\nconst days = [];\nfor (let i = 1; i <= 21; i++) {\n  const d = new Date(base.getTime() + i * 86400000);\n  const wd = d.getUTCDay();\n  if (wd === 0 || wd === 6) continue;\n  let slots = [\"10:00\", \"11:00\", \"13:00\", \"14:00\", \"15:00\", \"16:00\"];\n  if (wd === 3) slots = slots.filter((s) => s !== \"10:00\" && s !== \"11:00\");\n  if (wd === 5) slots = slots.filter((s) => s !== \"15:00\" && s !== \"16:00\");\n  days.push({ tarih: d.toISOString().slice(0, 10), saatler: slots });\n}\nconst reqDay = days.find((x) => x.tarih === reqDate);\nif (reqDay && reqTime && reqDay.saatler.includes(reqTime)) {\n  return JSON.stringify({ talepMusait: true, tarih: reqDate, saat: reqTime });\n}\nlet alt = null;\nif (reqDay && reqTime) {\n  const sorted = [...reqDay.saatler].sort((a, b) => Math.abs(toMin(a) - toMin(reqTime)) - Math.abs(toMin(b) - toMin(reqTime)));\n  alt = { tarih: reqDay.tarih, saat: sorted[0] };\n}\nif (!alt) {\n  const next = days.find((x) => !reqDate || x.tarih > reqDate) || days[0];\n  alt = { tarih: next.tarih, saat: next.saatler[0] };\n}\nreturn JSON.stringify({ talepMusait: false, talepTarih: reqDate, talepSaat: reqTime, alternatifTarih: alt.tarih, alternatifSaat: alt.saat });"
+        }
+      },
+      {
+        "id": "e1fe28e5-3814-4685-b5dd-536ae94e6339",
+        "name": "Ollama Sohbet Modeli",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+        "typeVersion": 1,
+        "position": [
+          1300,
+          520
+        ],
+        "parameters": {
+          "model": "llama3.2:latest",
+          "options": {
+            "temperature": 0.3,
+            "topP": 0.5
+          }
+        },
+        "credentials": {
+          "ollamaApi": {
+            "id": "DaoWAC6jdCxz0rqu",
+            "name": "Ollama account"
+          }
+        }
+      },
+      {
+        "id": "23c5d305-676c-4552-a394-2d494eda2582",
+        "name": "Toplanti Talebini Sheete Yaz",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1440,
+          260
+        ],
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "BizCard - Toplanti Talepleri",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Tarih": "={{ $('Alanlari Duzenle').first().json.tarih }}",
+              "Ad Soyad": "={{ $('Alanlari Duzenle').first().json.name }}",
+              "E-posta": "={{ $('Alanlari Duzenle').first().json.email }}",
+              "Telefon": "={{ $('Alanlari Duzenle').first().json.phone }}",
+              "Tercih Edilen Tarih": "={{ $('Alanlari Duzenle').first().json.preferredDate }}",
+              "Tercih Edilen Saat": "={{ $('Alanlari Duzenle').first().json.preferredTime }}",
+              "Mesaj": "={{ $('Alanlari Duzenle').first().json.message }}",
+              "AI Mesaji": "={{ $('Toplanti Asistani').first().json.output ?? '' }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Tarih",
+                "displayName": "Tarih",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Ad Soyad",
+                "displayName": "Ad Soyad",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "E-posta",
+                "displayName": "E-posta",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Telefon",
+                "displayName": "Telefon",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Tercih Edilen Tarih",
+                "displayName": "Tercih Edilen Tarih",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Tercih Edilen Saat",
+                "displayName": "Tercih Edilen Saat",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Mesaj",
+                "displayName": "Mesaj",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "AI Mesaji",
+                "displayName": "AI Mesaji",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "RAW"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "62mvKg7CLJ6NMmMZ",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "id": "533093ca-3649-4370-9f40-acaab06dea87",
+        "name": "Toplanti Yanit Maili Gonder",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1680,
+          260
+        ],
+        "parameters": {
+          "sendTo": "={{ $('Alanlari Duzenle').first().json.email }}",
+          "subject": "Sercan BALLI - Toplantı Talebiniz Alındı",
+          "emailType": "text",
+          "message": "={{ $('Toplanti Asistani').first().json.output || 'Merhaba ' + $('Alanlari Duzenle').first().json.name + ',\\n\\nToplantı talebinizi aldım. En geç 1 iş günü içinde size dönüş yapacağım.\\n\\nSevgiler,\\nSercan BALLI' }}",
+          "options": {}
+        },
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "EIyChTifK4SSOIws",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Alanlari Duzenle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Alanlari Duzenle": {
+        "main": [
+          [
+            {
+              "node": "Ortak Dogrulamayi Cagir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ortak Dogrulamayi Cagir": {
+        "main": [
+          [
+            {
+              "node": "Gecerli mi?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gecerli mi?": {
+        "main": [
+          [
+            {
+              "node": "Olay Turu",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Gecersiz Istegi Durdur",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Olay Turu": {
+        "main": [
+          [
+            {
+              "node": "Tesekkur Maili Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Toplanti Asistani",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tesekkur Maili Yaz": {
+        "main": [
+          [
+            {
+              "node": "Kart Kaydini Sheete Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Kart Kaydini Sheete Yaz": {
+        "main": [
+          [
+            {
+              "node": "Kart Tesekkur Maili Gonder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Toplanti Asistani": {
+        "main": [
+          [
+            {
+              "node": "Toplanti Talebini Sheete Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Toplanti Talebini Sheete Yaz": {
+        "main": [
+          [
+            {
+              "node": "Toplanti Yanit Maili Gonder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Musait Saat Kontrol": {
+        "ai_tool": [
+          [
+            {
+              "node": "Toplanti Asistani",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ollama Sohbet Modeli": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Toplanti Asistani",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Europe/Istanbul",
+      "callerPolicy": "workflowsFromSameOwner",
+      "errorWorkflow": "BzHataBildirim01"
+    },
+    "pinData": {}
+  }
+]

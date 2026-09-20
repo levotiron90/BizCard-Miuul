@@ -1,0 +1,141 @@
+[
+  {
+    "id": "BzHataBildirim01",
+    "name": "BizCard - Hata Bildirimi",
+    "active": false,
+    "nodes": [
+      {
+        "id": "5919d67d-9d61-4345-8a1d-3ba92ed26898",
+        "name": "Hata Tetikleyici",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "8651a5a9-104c-434b-a759-6aa52cee0987",
+        "name": "Hatayi Sheete Yaz",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          240,
+          0
+        ],
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "BizCard - Hatalar",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "timestamp": "={{ $now.toISO() }}",
+              "workflowName": "={{ $json.workflow.name }}",
+              "nodeName": "={{ $json.execution.lastNodeExecuted }}",
+              "errorMessage": "={{ $json.execution.error.message }}",
+              "executionUrl": "={{ $json.execution.url }}",
+              "inputData": "={{ JSON.stringify($json.execution.error) }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "timestamp",
+                "displayName": "timestamp",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "workflowName",
+                "displayName": "workflowName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "nodeName",
+                "displayName": "nodeName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "errorMessage",
+                "displayName": "errorMessage",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "executionUrl",
+                "displayName": "executionUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "inputData",
+                "displayName": "inputData",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "RAW"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "62mvKg7CLJ6NMmMZ",
+            "name": "Google Sheets account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Hata Tetikleyici": {
+        "main": [
+          [
+            {
+              "node": "Hatayi Sheete Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Europe/Istanbul",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "pinData": {}
+  }
+]

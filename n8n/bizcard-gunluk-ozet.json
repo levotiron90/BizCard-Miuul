@@ -1,0 +1,462 @@
+[
+  {
+    "id": "BzGunlukOzet0001",
+    "name": "BizCard - Gunluk Ozet",
+    "active": false,
+    "nodes": [
+      {
+        "id": "82e48927-7f64-4554-89c1-e5b458e2bd16",
+        "name": "Her Gun 23:59",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          -140
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 23,
+                "triggerAtMinute": 59
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "82160140-70ca-4b0b-8514-841334ba9b07",
+        "name": "Manuel Calistir",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          140
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "4c6949dc-d503-49d9-a98a-9fa373e26221",
+        "name": "Kart Kayitlarini Oku",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          240,
+          -140
+        ],
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "BizCard - Kart Kaydetme",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "62mvKg7CLJ6NMmMZ",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "id": "06f8034c-3001-44f7-9155-3e1a7160702a",
+        "name": "Toplanti Taleplerini Oku",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          240,
+          140
+        ],
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "BizCard - Toplanti Talepleri",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "62mvKg7CLJ6NMmMZ",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "id": "6c71a355-9c23-4316-ad4a-70728cf9e70e",
+        "name": "Kart Kaydi Olarak Etiketle",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          -140
+        ],
+        "parameters": {
+          "mode": "manual",
+          "includeOtherFields": true,
+          "assignments": {
+            "assignments": [
+              {
+                "id": "e9e1559d-9323-457c-8e87-efa1013702f1",
+                "name": "tur",
+                "value": "Kartı Kaydet",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "847f25f4-ab76-4c79-89c0-659b6a6cc480",
+        "name": "Toplanti Talebi Olarak Etiketle",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          140
+        ],
+        "parameters": {
+          "mode": "manual",
+          "includeOtherFields": true,
+          "assignments": {
+            "assignments": [
+              {
+                "id": "0e7ce64d-3f49-4cf2-a941-3955e8e31ef9",
+                "name": "tur",
+                "value": "Toplantı Talebi",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "9a06f355-dcd8-4bd2-b32c-ca3ef52b2353",
+        "name": "Kayitlari Birlestir",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          740,
+          0
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "04ffd370-9e36-49b5-b4a8-9b3ddd817cdd",
+        "name": "Bugunun Kayitlari",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          1000,
+          0
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "bb52c552-27bb-4ca4-a1e5-6e7ec1065a26",
+                "leftValue": "={{ String($json.Tarih).slice(0, 10) }}",
+                "rightValue": "={{ $now.toFormat('yyyy-MM-dd') }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "ae43ede5-e624-4c1d-8c58-b17a10753398",
+        "name": "Kayitlari Tek Tek Isle",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1240,
+          0
+        ],
+        "parameters": {
+          "batchSize": 10,
+          "options": {}
+        }
+      },
+      {
+        "id": "779697d1-a41f-40b7-8019-92bd6c1fe2ca",
+        "name": "Kaydi Hazirla",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1480,
+          140
+        ],
+        "parameters": {
+          "jsCode": "// Dongu govdesi: her kaydi ozet icin tek bicime getirir.\nreturn $input.all().map((i) => ({ json: { tur: i.json.tur, adSoyad: i.json[\"Ad Soyad\"] || \"(adsiz)\" } }));"
+        }
+      },
+      {
+        "id": "f036d843-e42d-460c-ab78-87bd5f4bf88d",
+        "name": "Turlere Gore Grupla",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1480,
+          -140
+        ],
+        "parameters": {
+          "jsCode": "// Dongu bittiginde tum kayitlar burada toplanir; olay turune gore gruplanir.\nconst today = $now.toFormat(\"yyyy-MM-dd\");\nconst groups = {};\nfor (const item of $input.all()) {\n  const { tur, adSoyad } = item.json;\n  if (!groups[tur]) groups[tur] = { sayi: 0, kisiler: [] };\n  groups[tur].sayi += 1;\n  groups[tur].kisiler.push(adSoyad);\n}\nreturn Object.keys(groups).map((tur) => ({ json: { ozetTarihi: today, tur, kayitSayisi: groups[tur].sayi, kisiler: groups[tur].kisiler.join(\", \") } }));"
+        }
+      },
+      {
+        "id": "c27d3e01-4cad-475b-bc82-cb4af2bef996",
+        "name": "Ozeti Sheete Yaz",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1720,
+          -140
+        ],
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1pSPfeaw-hVlRZkNUZMQfQy9pJO5KTW7Igz-DMYuqTHY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "BizCard - Gunluk Ozet",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Ozet Tarihi": "={{ $json.ozetTarihi }}",
+              "Tur": "={{ $json.tur }}",
+              "Kayit Sayisi": "={{ $json.kayitSayisi }}",
+              "Kisiler": "={{ $json.kisiler }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Ozet Tarihi",
+                "displayName": "Ozet Tarihi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Tur",
+                "displayName": "Tur",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Kayit Sayisi",
+                "displayName": "Kayit Sayisi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Kisiler",
+                "displayName": "Kisiler",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "RAW"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "62mvKg7CLJ6NMmMZ",
+            "name": "Google Sheets account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Her Gun 23:59": {
+        "main": [
+          [
+            {
+              "node": "Kart Kayitlarini Oku",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Toplanti Taleplerini Oku",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manuel Calistir": {
+        "main": [
+          [
+            {
+              "node": "Kart Kayitlarini Oku",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Toplanti Taleplerini Oku",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Kart Kayitlarini Oku": {
+        "main": [
+          [
+            {
+              "node": "Kart Kaydi Olarak Etiketle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Toplanti Taleplerini Oku": {
+        "main": [
+          [
+            {
+              "node": "Toplanti Talebi Olarak Etiketle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Kart Kaydi Olarak Etiketle": {
+        "main": [
+          [
+            {
+              "node": "Kayitlari Birlestir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Toplanti Talebi Olarak Etiketle": {
+        "main": [
+          [
+            {
+              "node": "Kayitlari Birlestir",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Kayitlari Birlestir": {
+        "main": [
+          [
+            {
+              "node": "Bugunun Kayitlari",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Bugunun Kayitlari": {
+        "main": [
+          [
+            {
+              "node": "Kayitlari Tek Tek Isle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Kayitlari Tek Tek Isle": {
+        "main": [
+          [
+            {
+              "node": "Turlere Gore Grupla",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Kaydi Hazirla",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Kaydi Hazirla": {
+        "main": [
+          [
+            {
+              "node": "Kayitlari Tek Tek Isle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Turlere Gore Grupla": {
+        "main": [
+          [
+            {
+              "node": "Ozeti Sheete Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Europe/Istanbul",
+      "callerPolicy": "workflowsFromSameOwner",
+      "errorWorkflow": "BzHataBildirim01"
+    },
+    "pinData": {}
+  }
+]

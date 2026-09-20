@@ -4,6 +4,27 @@ import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import PrivacyPolicyModal from "./PrivacyPolicyModal";
 import { EMAIL_PATTERN, todayISODate } from "../utils/vcard";
+import person from "../data/person";
+import webhooks from "../data/webhooks";
+
+const MEETING_TIMES = ["10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
+
+// Webhook sözleşmesi (bkz. bizcard-conventions): iki olay da aynı zarfı kullanır,
+// sadece "data" alanı değişir.
+async function sendToWebhook(url, event, visitor, data) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event,
+      cardId: person.cardId,
+      timestamp: new Date().toISOString(),
+      visitor: { name: visitor.name, email: visitor.email, phone: null },
+      data,
+    }),
+  });
+  if (!response.ok) throw new Error("Webhook isteği başarısız: " + response.status);
+}
 
 function dateToISODate(d) {
   const year = d.getFullYear();
@@ -12,14 +33,14 @@ function dateToISODate(d) {
   return `${year}-${month}-${day}`;
 }
 
-// Butonlar henüz bir webhook'a bağlı değil (web sürümüyle aynı durum);
-// gönderim setTimeout ile simüle edilir ve ilgili buton kısa süreliğine
-// kilitlenir, böylece art arda tıklanarak birden fazla kez tetiklenmesi
-// engellenir.
+// Butonlar n8n webhook'una bağlıdır (src/data/webhooks.js). Gönderim sırasında
+// ilgili buton kilitlenir, böylece art arda tıklanarak birden fazla kez
+// tetiklenmesi engellenir.
 export default function CardActionsForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState(null);
+  const [time, setTime] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
@@ -39,6 +60,19 @@ export default function CardActionsForm() {
     return nextErrors;
   }
 
+  async function submitToWebhook(action, url, event, data) {
+    setSubmitting((prev) => ({ ...prev, [action]: true }));
+    try {
+      await sendToWebhook(url, event, { name: name.trim(), email: email.trim() }, data);
+      setStatus({ action, state: "success" });
+    } catch (err) {
+      console.warn(err);
+      setStatus({ action, state: "error" });
+    } finally {
+      setSubmitting((prev) => ({ ...prev, [action]: false }));
+    }
+  }
+
   function handleSaveCard() {
     const nextErrors = validateContact();
     setErrors(nextErrors);
@@ -46,11 +80,7 @@ export default function CardActionsForm() {
       setStatus(null);
       return;
     }
-    setSubmitting((prev) => ({ ...prev, card: true }));
-    setTimeout(() => {
-      setSubmitting((prev) => ({ ...prev, card: false }));
-      setStatus({ action: "card", state: "success" });
-    }, 600);
+    submitToWebhook("card", webhooks.cardSave, "card.save", { note: null });
   }
 
   function handleRequestMeeting() {
@@ -60,16 +90,17 @@ export default function CardActionsForm() {
     } else if (dateToISODate(date) < todayISODate()) {
       nextErrors.date = "Geçmiş bir tarih seçemezsiniz.";
     }
+    if (!time) nextErrors.time = "Lütfen bir saat seçin.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       setStatus(null);
       return;
     }
-    setSubmitting((prev) => ({ ...prev, meeting: true }));
-    setTimeout(() => {
-      setSubmitting((prev) => ({ ...prev, meeting: false }));
-      setStatus({ action: "meeting", state: "success" });
-    }, 600);
+    submitToWebhook("meeting", webhooks.meetingRequest, "meeting.request", {
+      preferredDate: dateToISODate(date),
+      preferredTime: time,
+      message: null,
+    });
   }
 
   return (
@@ -125,6 +156,22 @@ export default function CardActionsForm() {
         {errors.date && <Text style={styles.error}>{errors.date}</Text>}
       </View>
 
+      <View style={styles.field}>
+        <Text style={styles.label}>Saat</Text>
+        <View style={styles.timeRow}>
+          {MEETING_TIMES.map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.timeChip, time === t && styles.timeChipSelected]}
+              onPress={() => setTime(t)}
+            >
+              <Text style={[styles.timeChipText, time === t && styles.timeChipTextSelected]}>{t}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {errors.time && <Text style={styles.error}>{errors.time}</Text>}
+      </View>
+
       <View style={styles.consentField}>
         <TouchableOpacity style={styles.consentRow} onPress={() => setConsent((prev) => !prev)}>
           <View style={[styles.checkbox, consent && styles.checkboxChecked]}>
@@ -169,6 +216,9 @@ export default function CardActionsForm() {
       )}
       {status && status.action === "meeting" && status.state === "success" && (
         <Text style={styles.statusSuccess}>Toplantı talebiniz alındı, teşekkürler!</Text>
+      )}
+      {status && status.state === "error" && (
+        <Text style={styles.statusError}>Gönderilemedi, lütfen biraz sonra tekrar deneyin.</Text>
       )}
 
       <PrivacyPolicyModal open={showPolicy} onClose={() => setShowPolicy(false)} />
@@ -216,5 +266,11 @@ const styles = StyleSheet.create({
   button: { borderRadius: 10, paddingVertical: 12, alignItems: "center" },
   buttonDisabled: { opacity: 0.6 },
   buttonText: { color: "#ffffff", fontSize: 13.5, fontWeight: "600" },
+  timeRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  timeChip: { borderWidth: 1, borderColor: "#dde5ea", borderRadius: 8, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: "#f5f8f9" },
+  timeChipSelected: { borderColor: "#1fb6c9", backgroundColor: "#1fb6c9" },
+  timeChipText: { fontSize: 13, color: "#0d1b34" },
+  timeChipTextSelected: { color: "#ffffff", fontWeight: "600" },
+  statusError: { color: "#e5484d", fontSize: 13, marginTop: 10, textAlign: "center" },
   statusSuccess: { color: "#1f9d55", fontSize: 13, marginTop: 10, textAlign: "center" },
 });
