@@ -1,0 +1,272 @@
+[
+  {
+    "id": "BzRagIndeks00001",
+    "name": "BizCard - RAG Indeksleme",
+    "active": false,
+    "nodes": [
+      {
+        "id": "b91d0729-750f-4f79-976d-6c1c60236a2f",
+        "name": "Dokuman Yukleme Formu",
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.5,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "formTitle": "BizCard Bilgi Dokumanlari Yukle",
+          "formDescription": "Uc PDF dosyasini birlikte yukleyin. Her yukleme, bilgi tabanini bastan olusturur; guncelleme icin yeni surumu secip iki dosyayi tekrar yukleyin.",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Profil ve Hizmetler Rehberi",
+                "fieldType": "file",
+                "multipleFiles": false,
+                "acceptFileTypes": ".pdf",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Profil Rehberi Versiyonu",
+                "fieldType": "dropdown",
+                "fieldOptions": {
+                  "values": [
+                    {
+                      "option": "v1"
+                    },
+                    {
+                      "option": "v2"
+                    }
+                  ]
+                },
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Toplanti ve Iletisim Politikasi",
+                "fieldType": "file",
+                "multipleFiles": false,
+                "acceptFileTypes": ".pdf",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Toplanti Politikasi Versiyonu",
+                "fieldType": "dropdown",
+                "fieldOptions": {
+                  "values": [
+                    {
+                      "option": "v1"
+                    },
+                    {
+                      "option": "v2"
+                    }
+                  ]
+                },
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Veri Endustri Kurumsal Rehberi",
+                "fieldType": "file",
+                "multipleFiles": false,
+                "acceptFileTypes": ".pdf",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Kurumsal Rehber Versiyonu",
+                "fieldType": "dropdown",
+                "fieldOptions": {
+                  "values": [
+                    {
+                      "option": "v1"
+                    },
+                    {
+                      "option": "v2"
+                    }
+                  ]
+                },
+                "requiredField": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "webhookId": "5f0c7a52-3b1e-4c6f-9a55-2d7e8b1c4a90"
+      },
+      {
+        "id": "4ef940a9-2a5a-4a8c-b2c9-bf06a57ca0ed",
+        "name": "Dokumanlari Ayir",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          0
+        ],
+        "parameters": {
+          "jsCode": "// Form tek bir item uretir; uc PDF'i ayri item'lara boler ve her birine kendi metadata'sini ekler.\nconst item = $input.first();\nconst keys = Object.keys(item.binary || {});\nif (keys.length < 3) {\n  throw new Error(\"Uc PDF dosyasi yuklenmelidir: profil rehberi, toplanti politikasi ve kurumsal rehber.\");\n}\nconst dokumanlar = [\n  {\n    dokuman_turu: \"profil_hizmetler\",\n    dokuman_versiyonu: item.json[\"Profil Rehberi Versiyonu\"],\n    meta_title: \"Profil, Hizmetler ve Kullanım Rehberi\",\n    meta_description: \"Sercan BALLI'nın uzmanlık alanları, hizmetleri, çalışma şekli ve dijital kartvizit kullanımı.\",\n    meta_keywords: \"profil, uzmanlık, hizmetler, çalışma şekli, kartvizit kullanımı, kartı kaydet, telefonuma ekle, QR kod\",\n  },\n  {\n    dokuman_turu: \"toplanti_iletisim\",\n    dokuman_versiyonu: item.json[\"Toplanti Politikasi Versiyonu\"],\n    meta_title: \"Toplantı ve İletişim Politikası\",\n    meta_description: \"Toplantı talebi süreci, yanıt süresi, müsait saatler, toplantı süresi, iptal ve KVKK bilgileri.\",\n    meta_keywords: \"toplantı, randevu, yanıt süresi, müsait saat, süre, iptal, KVKK\",\n  },\n  {\n    dokuman_turu: \"kurumsal_bilgi\",\n    dokuman_versiyonu: item.json[\"Kurumsal Rehber Versiyonu\"],\n    meta_title: \"Veri Endüstri Mühendislik A.Ş. Kurumsal Tanıtım ve Bilgi Rehberi\",\n    meta_description: \"Şirket hakkında, faaliyet alanları, sektörler, çözüm paketleri, çalışma yöntemi, teknoloji, gizlilik, kariyer, iletişim ve sık sorulan sorular.\",\n    meta_keywords: \"Veri Endüstri, şirket, kurumsal, faaliyet alanları, sektörler, çözüm paketleri, teknoloji, kariyer, staj, iletişim, SSS\",\n  },\n];\nreturn dokumanlar.map((d, i) => ({\n  json: { ...d, kaynak_dokuman: item.binary[keys[i]].fileName, eklenme_tarihi: item.json.submittedAt },\n  binary: { data: item.binary[keys[i]] },\n}));"
+        }
+      },
+      {
+        "id": "ba7778cc-8e7a-47bf-ad7e-ab74760e6cae",
+        "name": "Vector Store'a Yaz",
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+        "typeVersion": 1.3,
+        "position": [
+          480,
+          0
+        ],
+        "parameters": {
+          "mode": "insert",
+          "clearStore": true,
+          "memoryKey": {
+            "__rl": true,
+            "value": "bizcard_bilgi",
+            "mode": "id"
+          }
+        }
+      },
+      {
+        "id": "1e482e4a-4afd-4822-919e-1bce5ef16e66",
+        "name": "Dokuman Yukleyici",
+        "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+        "typeVersion": 1.1,
+        "position": [
+          480,
+          240
+        ],
+        "parameters": {
+          "dataType": "binary",
+          "textSplittingMode": "custom",
+          "options": {
+            "metadata": {
+              "metadataValues": [
+                {
+                  "name": "kaynak_dokuman",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.kaynak_dokuman }}"
+                },
+                {
+                  "name": "dokuman_turu",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.dokuman_turu }}"
+                },
+                {
+                  "name": "dokuman_versiyonu",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.dokuman_versiyonu }}"
+                },
+                {
+                  "name": "eklenme_tarihi",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.eklenme_tarihi }}"
+                },
+                {
+                  "name": "meta_title",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.meta_title }}"
+                },
+                {
+                  "name": "meta_description",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.meta_description }}"
+                },
+                {
+                  "name": "meta_keywords",
+                  "value": "={{ $('Dokumanlari Ayir').item.json.meta_keywords }}"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "e6fca985-be44-43b5-b4c2-30e4a9e3f11d",
+        "name": "Metin Parcalayici",
+        "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+        "typeVersion": 1,
+        "position": [
+          480,
+          460
+        ],
+        "parameters": {
+          "chunkSize": 1500,
+          "chunkOverlap": 200,
+          "options": {}
+        }
+      },
+      {
+        "id": "aec595bb-c68e-4d53-ae90-77a88127cef6",
+        "name": "Embeddings Ollama",
+        "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+        "typeVersion": 1,
+        "position": [
+          720,
+          240
+        ],
+        "parameters": {
+          "model": "nomic-embed-text:latest"
+        },
+        "credentials": {
+          "ollamaApi": {
+            "id": "DaoWAC6jdCxz0rqu",
+            "name": "Ollama account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Dokuman Yukleme Formu": {
+        "main": [
+          [
+            {
+              "node": "Dokumanlari Ayir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dokumanlari Ayir": {
+        "main": [
+          [
+            {
+              "node": "Vector Store'a Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dokuman Yukleyici": {
+        "ai_document": [
+          [
+            {
+              "node": "Vector Store'a Yaz",
+              "type": "ai_document",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Metin Parcalayici": {
+        "ai_textSplitter": [
+          [
+            {
+              "node": "Dokuman Yukleyici",
+              "type": "ai_textSplitter",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Ollama": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Vector Store'a Yaz",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Europe/Istanbul",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "pinData": {}
+  }
+]

@@ -1,0 +1,177 @@
+[
+  {
+    "id": "BzSssChatbot0001",
+    "name": "BizCard - SSS Chatbot",
+    "active": false,
+    "nodes": [
+      {
+        "id": "35bfaae2-27a4-4e3e-8339-341924fa49df",
+        "name": "Sohbet Mesaji Alindi",
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "public": true,
+          "mode": "webhook",
+          "options": {}
+        },
+        "webhookId": "9c4e2a10-7d3b-4f8a-b6c1-0e5a3d9f7b22"
+      },
+      {
+        "id": "9c86cfcd-4d34-4b3d-b543-878711d5ffb6",
+        "name": "Kartvizit Asistani",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          240,
+          0
+        ],
+        "parameters": {
+          "options": {
+            "systemMessage": "Sen Sercan BALLI'nın dijital kartvizit asistanısın. Ziyaretçilerin Sercan'ın uzmanlık alanları, hizmetleri, çalışma şekli, toplantı süreci, dijital kartvizit kullanımı ve Sercan'ın çalıştığı Veri Endüstri Mühendislik A.Ş. hakkındaki sorularını yanıtlarsın. Elinde bizcard_bilgi_arama adında bir arama tool'u var. TÜM bilgin (hizmetler, süreler, toplantı saatleri, kurallar dahil) SADECE bu tool'un döndürdüğü sonuçlardan gelir; hiçbir bilgiyi ezbere veya varsayarak verme.\n\nKURALLAR:\n- Cevap yazmadan önce bizcard_bilgi_arama tool'unu gerçek bir fonksiyon çağrısıyla çağır. Tool'u bu mesaj için SADECE 1 KEZ çağır; sonucu aldıktan sonra tekrar çağırma.\n- Takip sorularında (\"Bu ne kadar sürer?\", \"Peki iptal edebilir miyim?\" gibi) önceki konuşmadan konuyu çöz ve tool'a konusu açık, tek başına anlaşılır bir arama sorgusu gönder (örn. \"toplantı süresi\").\n- Yeni mesaj farklı bir konuya geçtiyse önceki cevabın içeriğini yeni cevaba taşıma; her cevap o anki soruya özel olsun.\n- Aynı konuda tool sonuçlarında farklı doküman versiyonları (dokuman_versiyonu) varsa en yüksek versiyonu esas al.\n- Tool sonuçlarında sorunun cevabı yoksa bilmediğini açıkça söyle ve ziyaretçiyi \"Toplantı Talep Et\" düğmesiyle Sercan'a ulaşmaya yönlendir. Tekrar tool çağırarak arama yapma.\n- Fiyat uydurma. Hizmetler teklif usulü çalışır; tool'da fiyat bilgisi yoksa bunu söyle ve tanışma toplantısı öner.\n- Toplantıyı asla kendin onaylama veya randevu verme; toplantı talebinin \"Toplantı Talep Et\" düğmesiyle yapıldığını ve kesin onayın Sercan'dan geldiğini belirt.\n- SADECE ve SADECE düzgün, akıcı Türkçe yaz. Başka hiçbir dilden tek kelime bile kullanma.\n- Sıcak ve profesyonel, kısa ve net cevap ver (en fazla 3-4 cümle). Sadece cevap metnini yaz; başlık, madde işareti veya açıklama ekleme.\n- Cevabı SADECE düz metin olarak yaz. JSON, süslü parantez, alan adı (örn. \"answer\") veya kod bloğu kullanma.",
+            "maxIterations": 4
+          }
+        }
+      },
+      {
+        "id": "dbba4de6-6a10-490f-9e22-7df296630f63",
+        "name": "bizcard_bilgi_arama",
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+        "typeVersion": 1.3,
+        "position": [
+          300,
+          300
+        ],
+        "parameters": {
+          "mode": "retrieve-as-tool",
+          "toolDescription": "Sercan BALLI'nın profili, hizmetleri, çalışma şekli, toplantı ve iletişim politikası (süre, müsait saatler, yanıt süresi, iptal, KVKK), dijital kartvizit kullanımı ve Veri Endüstri Mühendislik A.Ş. (şirket, faaliyet alanları, sektörler, çözüm paketleri, teknoloji, kariyer, iletişim, SSS) hakkında bilgi arar. Ziyaretçiden gelen her soru için mutlaka önce bu tool çağrılmalıdır.",
+          "memoryKey": {
+            "__rl": true,
+            "value": "bizcard_bilgi",
+            "mode": "list",
+            "cachedResultName": "bizcard_bilgi"
+          },
+          "topK": 10
+        }
+      },
+      {
+        "id": "a09dd156-ff99-400f-a931-62d6335efb57",
+        "name": "Embeddings Ollama",
+        "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+        "typeVersion": 1,
+        "position": [
+          420,
+          500
+        ],
+        "parameters": {
+          "model": "nomic-embed-text:latest"
+        },
+        "credentials": {
+          "ollamaApi": {
+            "id": "DaoWAC6jdCxz0rqu",
+            "name": "Ollama account"
+          }
+        }
+      },
+      {
+        "id": "b966d3e6-6ac9-4503-9a36-0da9fb1724d9",
+        "name": "Konusma Hafizasi",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          100,
+          300
+        ],
+        "parameters": {
+          "contextWindowLength": 5
+        }
+      },
+      {
+        "id": "36e54de4-fd34-4308-929d-229ce0c48fd8",
+        "name": "OpenRouter Sohbet Modeli",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          -60,
+          300
+        ],
+        "parameters": {
+          "model": "nex-agi/nex-n2.5-pro:free",
+          "options": {}
+        },
+        "credentials": {
+          "openRouterApi": {
+            "id": "xnGTajGhCIC5UxDg",
+            "name": "OpenRouter account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Sohbet Mesaji Alindi": {
+        "main": [
+          [
+            {
+              "node": "Kartvizit Asistani",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "bizcard_bilgi_arama": {
+        "ai_tool": [
+          [
+            {
+              "node": "Kartvizit Asistani",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Ollama": {
+        "ai_embedding": [
+          [
+            {
+              "node": "bizcard_bilgi_arama",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Konusma Hafizasi": {
+        "ai_memory": [
+          [
+            {
+              "node": "Kartvizit Asistani",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenRouter Sohbet Modeli": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Kartvizit Asistani",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Europe/Istanbul",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "pinData": {}
+  }
+]
